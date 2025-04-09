@@ -1,0 +1,20 @@
+.mat-mdc-row-secc .mat-mdc-cell {
+    cursor: pointer !important;
+}
+
+/* Estilo para el hover en las filas */
+.mat-mdc-row-secc:hover .mat-mdc-cell {
+    background-color: #adc3fd !important; /* Color de fondo al hacer hover */
+    transition: background-color 0.3s ease; /* Transición suave */
+}
+
+/* Estilo para el hover en modo oscuro (si es necesario) */
+.dark .mat-mdc-row-secc:hover .mat-mdc-cell {
+    background-color: #4b5563 !important; /* Color de fondo en modo oscuro */
+}
+
+/* Estilo para la fila seleccionada */
+.mat-mdc-row-secc-seleccion .mat-mdc-cell {
+    border-color: darkred !important;
+    background-color: #adc3fd !important;
+}

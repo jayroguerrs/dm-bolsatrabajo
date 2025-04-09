@@ -1,0 +1,18 @@
+/* Asegúrate de que el iframe ocupe toda la pantalla */
+:host {
+    display: block;
+    height: 100vh; /* Altura total de la ventana */
+    width: 100vw; /* Ancho total de la ventana */
+    margin: 0;
+}
+
+.report-container {
+    height: 100%; /* Contenedor del iframe ocupa toda la altura */
+    width: 100%;  /* Contenedor del iframe ocupa todo el ancho */
+}
+
+iframe {
+    border: none; /* Elimina bordes */
+    height: 100%; /* Altura total del contenedor */
+    width: 100%; /* Ancho total del contenedor */
+}

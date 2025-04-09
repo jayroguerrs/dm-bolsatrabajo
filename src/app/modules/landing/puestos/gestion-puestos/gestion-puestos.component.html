@@ -1,0 +1,103 @@
+<!-- Wrapper -->
+<div class="flex w-full min-w-0 flex-auto flex-col">
+    <!-- Header -->
+    <div
+        class=" relative z-49 flex h-22 w-full flex-0 items-center px-4 shadow dark:border-b dark:bg-transparent dark:shadow-none md:px-6 print:hidden"
+    >
+        <!-- Components -->
+        <div class="flex items-start space-x-0.5 pl-2 sm:space-x-2">
+            <img src="images/logo/logo-derrama-magisterial.svg" alt="Fuse logo" />
+        </div>
+    </div>
+
+    <div *ngIf="objPuestos">
+        <!-- Content -->
+        <div class="flex min-w-0 flex-auto flex-col">
+            <!-- Header -->
+            <div class="bg-card flex flex-col shadow">
+                <!-- Cover image -->
+                <div>
+                    <img
+                        class="h-40 object-cover lg:h-80"
+                        [src]="objPuestos.Imagen"
+                        alt="Cover image"
+                    />
+                </div>
+            </div>
+
+            <!-- Main -->
+            <div
+                class="mx-auto w-full max-w-full flex-auto justify-center p-6 sm:p-8"
+            >
+                <!-- Column -->
+                <div class="flex flex-col items-center">
+                    <!-- Filtros -->
+                    <div class="flex w-full max-w-6xl flex-col p-6 pb-6 sm:p-8">
+                        <!-- Column -->
+                        <div class="mt-3 truncate text-4xl font-bold">
+                            {{ objPuestos.Titulo }}
+                        </div>
+
+                        <div class="mt-4 flex flex-col space-y-8 border-t pt-6">
+                            <!-- Fecha -->
+                            <div class="flex sm:items-center">
+                                <mat-icon
+                                    [svgIcon]="'heroicons_outline:calendar-days'"
+                                ></mat-icon>
+                                <div class="ml-6 leading-6">
+                                    <strong>Fecha de Fin:</strong>
+                                </div>
+                                <div class="ml-6 leading-6">
+                                    {{ objPuestos.FechaFin | date:'dd/MM/yyyy' }}
+                                </div>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <div class="flex sm:items-center">
+                                <mat-icon
+                                    [svgIcon]="
+                                        'heroicons_outline:building-office-2'
+                                    "
+                                ></mat-icon>
+                                <div class="ml-6 leading-6">
+                                    <strong>Ubicación:</strong>
+                                </div>
+                                <div class="ml-11 leading-6">
+                                    {{ objPuestos.Departamento + ', ' + objPuestos.Distrito}}
+                                </div>
+                            </div>
+
+                            <div [innerHTML]="objPuestos.Descripcion"></div>
+                        </div>
+
+                        <div class="mt-6 flex flex-col space-y-8 border-t pt-6">
+                            <!-- Actions -->
+                            <div class="flex items-center justify-end mt-4 mb-2">
+                                <button
+                                    class="ml-4 w-auto min-w-26"
+                                    mat-flat-button
+                                    type="button"
+                                    [color]="'primary'"
+                                    (click)="postular()"
+                                    >
+                                    <mat-icon
+                                        class="icon-size-5 mr-2"
+                                        [svgIcon]="'heroicons_outline:document-check'">
+                                    </mat-icon>
+                                    <span class="ml-2 mr-1">Postular</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!objPuestos">
+        <p>Cargando datos...</p>
+    </div>
+
+</div>
+

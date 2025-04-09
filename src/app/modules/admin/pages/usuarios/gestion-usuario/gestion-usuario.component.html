@@ -1,0 +1,153 @@
+<div class="-m-6 flex max-h-screen flex-col ">
+    <!-- Header -->
+    <div
+        class="flex h-16 flex-0 items-center justify-between bg-primary-700 pl-6 pr-3 text-on-primary sm:pl-8 sm:pr-5"
+    >
+        <div class="text-lg font-medium">{{titulo}}</div>
+        <button mat-icon-button (click)="saveAndClose()" [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x-mark'"
+            ></mat-icon>
+        </button>
+    </div>
+
+    <!-- Compose form -->
+    <form
+        class="flex flex-auto flex-col overflow-y-auto p-6 sm:p-8 flex-grow"
+        [formGroup]="usuarioForm"
+    >
+        <div class="mt-4 grid w-full gap-4 md:grid-cols-4">
+            <!-- Apellido Paterno -->
+            <div class="md:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Apellido Paterno</mat-label>
+                    <input [onlyLetter]="true" matInput [formControlName]="'paterno'" maxlength="50"
+                        [class.componentes-deshabilitados]="usuarioForm.get('paterno').disabled"
+                    />
+                    @if (usuarioForm.get('paterno').hasError('required')) {
+                        <mat-error> El apellido paterno es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Apellido Materno -->
+            <div class="md:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Apellido Materno</mat-label>
+                    <input [onlyLetter]="true" matInput [formControlName]="'materno'" maxlength="50"
+                        [class.componentes-deshabilitados]="usuarioForm.get('materno').disabled"
+                    />
+                    @if (usuarioForm.get('materno').hasError('required')) {
+                        <mat-error> El apellido materno es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Nombres-->
+            <div class="md:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Nombres</mat-label>
+                    <input [onlyLetter]="true" matInput [formControlName]="'nombres'" maxlength="50"
+                        [class.componentes-deshabilitados]="usuarioForm.get('nombres').disabled"
+                    />
+                    @if (usuarioForm.get('nombres').hasError('required')) {
+                        <mat-error> El nombres es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Correo -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Correo electrónico</mat-label>
+                    <input matInput [formControlName]="'correo'" maxlength="50"
+                        [class.componentes-deshabilitados]="usuarioForm.get('correo').disabled"
+                    />
+                    @if (usuarioForm.get('correo').hasError('required')) {
+                        <mat-error> El correo es necesario </mat-error>
+                    } @else if (usuarioForm.get('correo').hasError('email')) {
+                        <mat-error> El correo no es válido </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Código -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Código</mat-label>
+                    <input matInput [formControlName]="'codigo'" maxlength="50"
+                        [class.componentes-deshabilitados]="usuarioForm.get('codigo').disabled"
+                    />
+                    @if (usuarioForm.get('codigo').hasError('required')) {
+                        <mat-error> El código es necesario </mat-error>
+                    } @else if (usuarioForm.get('codigo').hasError('pattern')) {
+                        <mat-error> El código no es válido </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Rol -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Rol</mat-label>
+                    <mat-select [formControlName]="'rol'"
+                        [class.componentes-deshabilitados]="usuarioForm.get('rol').disabled"
+                    >
+                        <mat-option *ngFor="let objRol of lstRol" [value]="objRol.Id">
+                            {{objRol.Nombre }}
+                        </mat-option>
+                    </mat-select>
+                    @if (usuarioForm.get('rol').hasError('invalidRol') ) {
+                        <mat-error> El rol es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Estado -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Estado</mat-label>
+                    <mat-select formControlName="estado"
+                        [class.componentes-deshabilitados]="usuarioForm.get('estado').disabled"
+                    >
+                        <mat-option *ngFor="let objEstado of lstEstado" [value]="objEstado.Codigo">
+                            {{objEstado.Nombre }}
+                        </mat-option>
+                    </mat-select>
+                    @if (usuarioForm.get('estado').hasError('required')) {
+                        <mat-error> El estado es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div
+            class="mt-4 flex flex-col justify-end sm:mt-6 sm:flex-row sm:items-center"
+        >
+            <div class="mt-4 flex items-center sm:mt-0">
+                <!-- Cancelar -->
+                <button
+                    class="sm:mx-3"
+                    mat-stroked-button
+                    (click)="matDialogRef.close()"
+                >
+                    <span>Cancelar</span>
+                </button>
+                <!-- Guardar -->
+                @if (!frmDisabled){
+                    <button
+                        [disabled]="usuarioForm.invalid  || nNuevo"
+                        class="order-first sm:order-last"
+                        mat-flat-button
+                        [color]="'primary'"
+                        (click)="guardar()"
+                    >
+                        Guardar
+                    </button>
+                }
+            </div>
+        </div>
+    </form>
+</div>

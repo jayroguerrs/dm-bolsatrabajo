@@ -1,0 +1,152 @@
+<!-- Wrapper -->
+<div class="flex w-full min-w-0 flex-auto flex-col">
+    <!-- Header -->
+    <div
+        class=" relative z-49 flex h-22 w-full flex-0 items-center px-4 shadow dark:border-b dark:bg-transparent dark:shadow-none md:px-6 print:hidden"
+    >
+
+        <!-- Components -->
+        <div class="flex items-start space-x-0.5 pl-2 sm:space-x-2">
+            <img src="images/logo/logo-derrama-magisterial.svg" alt="Fuse logo" />
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="flex min-w-0 flex-auto flex-col">
+        <!-- Header -->
+        <div class="bg-card flex flex-col shadow">
+            <!-- Cover image -->
+            <div>
+                <img
+                    class="h-40 object-cover lg:h-80"
+                    src="images/pages/profile/cover.jpg"
+                    alt="Cover image"
+                />
+            </div>
+        </div>
+
+        <!-- Main -->
+        <div
+            class="mx-auto w-full max-w-full flex-auto justify-center p-6 sm:p-8"
+        >
+            <!-- Column -->
+            <div class="flex flex-col items-center">
+                <!-- Filtros -->
+                <fuse-card class="flex w-full max-w-6xl flex-col p-6 pb-6 sm:p-8">
+                    <form [formGroup]="frmPuestos">
+                        <div class="grid md:grid-cols-12 gap-6 w-full mt-3">
+                            <!-- Buscar por título -->
+                            <div class="md:col-span-4">
+                                <mat-form-field
+                                    class="w-full"
+                                    [subscriptSizing]="'dynamic'">
+                                    <mat-label>Buscar por título</mat-label>
+                                    <input formControlName="titulo" matInput maxlength="50" [placeholder]="'Buscar por código o nombre'" (keydown.enter)="listarResumen()" />
+                                </mat-form-field>
+                            </div>
+                            <!-- Buscar por Ubicación -->
+                            <div class="md:col-span-4">
+                                <mat-form-field
+                                    class="w-full"
+                                    [subscriptSizing]="'dynamic'">
+                                    <mat-label>Buscar por ubicación</mat-label>
+                                    <input formControlName="ubicacion" matInput maxlength="50" [placeholder]="'Buscar por código o nombre'"  />
+                                </mat-form-field>
+                            </div>
+                            <!-- Buscar por Fecha -->
+                            <div class="md:col-span-4">
+                                <mat-form-field
+                                    class="w-full"
+                                    [subscriptSizing]="'dynamic'">
+                                    <mat-label>Buscar por fecha</mat-label>
+                                    <input formControlName="fechareg" matInput maxlength="50" [placeholder]="'Buscar por código o nombre'"  />
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <!-- Actions -->
+                        <div class="flex items-center justify-end mt-4 mb-2">
+                            <button
+                                class="w-auto min-w-26"
+                                mat-stroked-button
+                                type="button"
+                                >
+                                <mat-icon
+                                    class="icon-size-5 mr-2"
+                                    [svgIcon]="'cleaning_services'">
+                                </mat-icon>
+                                <span class="ml-2 mr-1">Limpiar</span>
+                            </button>
+                            <button
+                                class="ml-4 w-auto min-w-26"
+                                mat-flat-button
+                                type="button"
+                                [color]="'primary'"
+                                >
+                                <mat-icon
+                                    class="icon-size-5 mr-2"
+                                    [svgIcon]="'filter_alt'">
+                                </mat-icon>
+                                <span class="ml-2 mr-1">Filtrar</span>
+                            </button>
+                        </div>
+                    </form>
+                </fuse-card>
+
+                <!-- Tabla de resultaos -->
+                <fuse-card class="flex w-full max-w-6xl flex-col p-6 pb-6 sm:p-8 mt-5">
+                    <!-- Products list -->
+                    <div class="flex flex-col flex-auto overflow-hidden sm:overflow-y-auto overflow-x-auto">
+                        <table class="w-full" mat-table [dataSource]="dataSource" matSort matSortDisableClear>
+                            <ng-container matColumnDef="id">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span class="whitespace-nowrap pr-6 text-sm">{{ element.Id }}</span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="titulo">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Titulo </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span class="whitespace-nowrap pr-6 text-sm">{{ element.Titulo }}</span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="fechafin">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha de Fin </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span class="whitespace-nowrap pr-6 text-sm">{{ element.FechaFin | date:'dd/MM/yyyy' }}</span>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="ubicacion">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha de Fin </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <span class="whitespace-nowrap pr-6 text-sm">{{ element.Ubicacion }}</span>
+                                </td>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="columnasTabla"></tr>
+                            <tr
+                                class="order-row h-16 mat-mdc-row-secc"
+                                *matRowDef="let row; columns: columnasTabla;"
+                                [ngClass]="{'mat-mdc-row-secc-seleccion': selectedRow && row.Id === selectedRow.Id}"
+                                mat-row
+                                (click)="abrirPostulacion(row)"
+                            ></tr>
+                        </table>
+
+                        <div class="no-results" *ngIf="!(dataSource.loading$ | async)" [style.display]="dataSource.totalItems === 0 ? '' : 'none'">
+                            No se encontraron convocatorias vigentes.
+                        </div>
+                        <div class="overlay" *ngIf="dataSource.loading$ | async">
+                            <div class="spinner-container">
+                                <mat-progress-spinner color="warn" diameter="100" mode="indeterminate">
+                                </mat-progress-spinner>
+                            </div>
+                        </div>
+                        <mat-paginator class="border-t" [length]="dataSource.totalItems" [pageSize]="10" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20,50]" aria-label="Selecciona página del listado">
+                        </mat-paginator>
+                    </div>
+                </fuse-card>
+            </div>
+        </div>
+    </div>
+
+</div>
+

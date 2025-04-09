@@ -1,0 +1,14 @@
+<div class="h-11 w-64 tems-center justify-center">
+    <mat-form-field class="w-full fuse-mat-dense fuse-mat-rounded fuse-mat-bold">
+        <mat-icon
+            class="icon-size-5"
+            [svgIcon]="'heroicons_solid:user'"
+            matPrefix>
+        </mat-icon>
+        <mat-select [formControlName]="'tipodoc'" (selectionChange)="seleccionarRol()">
+            <mat-option *ngFor="let objRol of lstRoles" [value]="objRol.Id">
+                {{objRol.Nombre}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>

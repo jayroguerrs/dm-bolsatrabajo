@@ -1,0 +1,210 @@
+<div class="w-full max-w-3xl">
+    <!-- Form -->
+    <form [formGroup]="accountForm">
+        <!-- Section -->
+        <div class="w-full">
+            <div class="text-xl">Perfil</div>
+            <div class="text-secondary">
+                La siguiente información es pública
+            </div>
+        </div>
+        <div class="mt-8 grid w-full gap-6 sm:grid-cols-4">
+            <!-- Codigo -->
+            <!--
+                <div class="sm:col-span-2">
+                    <mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+                        <mat-label>Código</mat-label>
+                        <mat-icon
+                            class="icon-size-5"
+                            [svgIcon]="'heroicons_solid:user'"
+                            matPrefix
+                        ></mat-icon>
+                        <input [formControlName]="'codigo'" matInput />
+                        @if (accountForm.get('codigo').hasError('required')) {
+                            <mat-error> El código es necesario </mat-error>
+                        }
+                    </mat-form-field>
+                </div>
+            -->
+            <!-- Nombres -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+                    <mat-label>Nombres</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:user'"
+                        matPrefix
+                    ></mat-icon>
+                    <input [formControlName]="'nombres'" matInput />
+                    @if (accountForm.get('nombres').hasError('required')) {
+                        <mat-error> El nombre es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+            <!-- Apellido Paterno -->
+            <div class="sm:col-span-4">
+                <mat-form-field
+                    class="w-full" [subscriptSizing]="'dynamic'">
+                    <mat-label>Apellido Paterno</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:user'"
+                        matPrefix
+                    ></mat-icon>
+                    <input [formControlName]="'paterno'" matInput />
+                    @if (accountForm.get('paterno').hasError('required')) {
+                        <mat-error> El apellido paterno es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+            <!-- Apellido Materno -->
+            <div class="sm:col-span-4">
+                <mat-form-field
+                    class="w-full" [subscriptSizing]="'dynamic'">
+                    <mat-label>Apellido Materno</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:user'"
+                        matPrefix
+                    ></mat-icon>
+                    <input [formControlName]="'materno'" matInput />
+                    @if (accountForm.get('materno').hasError('required')) {
+                        <mat-error> El apellido materno es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+            <!-- Tipo de Documento -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Tipo de Documento</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:document'"
+                        matPrefix>
+                    </mat-icon>
+                    <mat-select [formControlName]="'tipodoc'">
+                        <mat-option *ngFor="let objTipoDoc of lstTipoDoc" [value]="objTipoDoc.Id">
+                            {{objTipoDoc.Nombre }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <!-- Numero de Documento -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+                    <mat-label>Número de Documento</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:briefcase'"
+                        matPrefix
+                    ></mat-icon>
+                    <input [formControlName]="'numdoc'" matInput />
+                </mat-form-field>
+            </div>
+            <!-- Biografía -->
+            <div class="sm:col-span-4">
+            <mat-form-field
+                class="w-full" [subscriptSizing]="'dynamic'">
+                <mat-label>Biografía</mat-label>
+                <textarea [formControlName]="'bio'" matInput rows="4">
+                </textarea>
+            </mat-form-field>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="my-10 border-t"></div>
+
+        <!-- Section -->
+        <div class="w-full">
+            <div class="text-xl">Información Personal</div>
+            <div class="text-secondary">
+                Información adicional en caso quieren ponerse en contacto con usted.
+            </div>
+        </div>
+        <div class="mt-8 grid w-full gap-6 sm:grid-cols-4">
+            <!-- Email -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+                    <mat-label>Correo Institucional</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:envelope'"
+                        matPrefix
+                    ></mat-icon>
+                    <input [formControlName]="'email'" matInput />
+                    @if (accountForm.get('email').hasError('email')) {
+                        <mat-error> El correo electrónico no es válido </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+            <!-- Phone -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+                    <mat-label>Anexo</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:phone'"
+                        matPrefix
+                    ></mat-icon>
+                    <input [formControlName]="'telephone'" matInput />
+                    @if (accountForm.get('telephone').hasError('pattern')) {
+                        <mat-error> El celular debe tener 9 dígitos y debe empezar por "9" </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+            <!-- Birthday -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+                    <mat-label>Fecha de Nacimiento</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:cake'"
+                        matPrefix
+                    ></mat-icon>
+                    <input matInput [matDatepicker]="fechanac" [formControlName]="'fechanac'">
+                    <mat-datepicker-toggle matIconSuffix [for]="fechanac"></mat-datepicker-toggle>
+                    <mat-datepicker #fechanac></mat-datepicker>
+                    @if (accountForm.get('fechanac').hasError('required')) {
+                        <mat-error> La fecha de emisión es necesaria </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+            <!-- Género -->
+            <div class="sm:col-span-2">
+                <mat-form-field
+                    class="w-full"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-label>Género</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'male'"
+                        matPrefix></mat-icon>
+                        <mat-select formControlName="sexo">
+                            <mat-option *ngFor="let objSexo of lstSexo" [value]="objSexo.Id">
+                                {{objSexo.Nombre }}
+                            </mat-option>
+                        </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="mb-10 mt-11 border-t"></div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end">
+            <button mat-stroked-button type="button">Cancelar</button>
+            <button
+                [disabled]="accountForm.invalid"
+                (click)="save()"
+                class="ml-4"
+                mat-flat-button
+                type="button"
+                [color]="'primary'"
+            >
+                Guardar
+            </button>
+        </div>
+    </form>
+</div>

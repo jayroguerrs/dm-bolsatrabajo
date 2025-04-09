@@ -1,0 +1,152 @@
+<div class="-m-6 flex max-h-screen flex-col ">
+    <!-- Header -->
+    <div
+        class="flex h-16 flex-0 items-center justify-between bg-primary-700 pl-6 pr-3 text-on-primary sm:pl-8 sm:pr-5"
+    >
+        <div class="text-lg font-medium">{{titulo}}</div>
+        <button mat-icon-button (click)="saveAndClose()" [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x-mark'"
+            ></mat-icon>
+        </button>
+    </div>
+
+    <!-- Compose form -->
+    <form
+        class="flex flex-auto flex-col overflow-y-auto p-6 sm:p-8 flex-grow"
+        [formGroup]="catalogoDetalleForm"
+    >
+        <div class="mt-4 grid w-full gap-4 md:grid-cols-4 md:grid-rows-4">
+
+            <!-- Código -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Código del detalle</mat-label>
+                    <input matInput [formControlName]="'codigo'" maxlength="50"
+                        [class.componentes-deshabilitados]="catalogoDetalleForm.get('codigo').disabled"
+                    />
+                    @if (catalogoDetalleForm.get('codigo').hasError('required')) {
+                        <mat-error> El código del detalle es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Nombre -->
+            <div class="md:row-start-2 md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Nombre del Detalle</mat-label>
+                    <input [onlyLetter]="true" matInput [formControlName]="'nombre'" maxlength="50"
+                        [class.componentes-deshabilitados]="catalogoDetalleForm.get('nombre').disabled"
+                    />
+                    @if (catalogoDetalleForm.get('nombre').hasError('required')) {
+                        <mat-error> El nombre del detalle es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Descripción -->
+            <div class="md:row-start-2 md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Descripción</mat-label>
+                    <input [onlyLetter]="true" matInput [formControlName]="'descripcion'" maxlength="200"
+                        [class.componentes-deshabilitados]="catalogoDetalleForm.get('descripcion').disabled"
+                    />
+                    @if (catalogoDetalleForm.get('descripcion').hasError('required')) {
+                        <mat-error> La descripción es necesaria </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Abreviatura -->
+            <div class="md:row-start-3 md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Abreviatura</mat-label>
+                    <input [onlyLetter]="true" matInput [formControlName]="'abreviatura'" maxlength="50"
+                        [class.componentes-deshabilitados]="catalogoDetalleForm.get('abreviatura').disabled"
+                    />
+                    @if (catalogoDetalleForm.get('abreviatura').hasError('required')) {
+                        <mat-error> La abreviatura es necesaria </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Catalogo -->
+            <div class="md:row-start-3 md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Catálogo</mat-label>
+                    <mat-select [formControlName]="'catalogo'"
+                        [class.componentes-deshabilitados]="catalogoDetalleForm.get('catalogo').disabled"
+                    >
+                        <mat-option *ngFor="let objCatalogo of lstCatalogo" [value]="objCatalogo.IdCatalogo">
+                            {{objCatalogo.Nombre }}
+                        </mat-option>
+                    </mat-select>
+                    @if (catalogoDetalleForm.get('catalogo').hasError('invalidRol') ) {
+                        <mat-error> El rol es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Ordanamiento -->
+            <div class="md:row-start-4 md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Ordenamiento</mat-label>
+                    <input matInput [formControlName]="'ordenamiento'" maxlength="50"
+                        [class.componentes-deshabilitados]="catalogoDetalleForm.get('ordenamiento').disabled"
+                    />
+                    @if (catalogoDetalleForm.get('ordenamiento').hasError('required')) {
+                        <mat-error> El ordenamiento es necesario </mat-error>
+                    } @else if (catalogoDetalleForm.get('ordenamiento').hasError('email')) {
+                        <mat-error> El ordenamiento no es válido </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Estado -->
+            <div class="md:row-start-4 md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Estado</mat-label>
+                    <mat-select formControlName="estado"
+                        [class.componentes-deshabilitados]="catalogoDetalleForm.get('estado').disabled"
+                    >
+                        <mat-option *ngFor="let objEstado of lstEstado" [value]="objEstado.Codigo">
+                            {{objEstado.Nombre }}
+                        </mat-option>
+                    </mat-select>
+                    @if (catalogoDetalleForm.get('estado').hasError('required')) {
+                        <mat-error> El estado es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div
+            class="mt-4 flex flex-col justify-end sm:mt-6 sm:flex-row sm:items-center"
+        >
+            <div class="mt-4 flex items-center sm:mt-0">
+                <!-- Cancelar -->
+                <button
+                    class="sm:mx-3"
+                    mat-stroked-button
+                    (click)="matDialogRef.close()"
+                >
+                    <span>Cancelar</span>
+                </button>
+                <!-- Guardar -->
+                @if (!frmDisabled){
+                    <button
+                        [disabled]="catalogoDetalleForm.invalid  || nNuevo"
+                        class="order-first sm:order-last"
+                        mat-flat-button
+                        [color]="'primary'"
+                        (click)="guardar()"
+                    >
+                        Guardar
+                    </button>
+                }
+            </div>
+        </div>
+    </form>
+</div>

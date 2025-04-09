@@ -1,0 +1,19 @@
+<mat-form-field class="w-full" [subscriptSizing]="'dynamic'">
+    <mat-label>
+        <span class="font-bold me-2">{{ index + '.' }}</span>
+        <span>{{ label }}</span>
+    </mat-label>
+
+    <input matInput
+           [matDatepicker]="picker"
+           [formControl]="dateControl"
+           [placeholder]="placeholder"
+           [required]="required" />
+
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+
+    <mat-error *ngIf="dateControl.hasError('required')">
+        Campo obligatorio
+    </mat-error>
+</mat-form-field>
