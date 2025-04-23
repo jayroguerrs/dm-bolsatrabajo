@@ -2,3 +2,12 @@
 /*  @ Import/write your custom styles here.
 /*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
 /* ----------------------------------------------------------------------------------------------------- */
+
+.no-results {
+    display: flex;
+    justify-content: center;
+    padding: 12px;
+    font-size: 14px !important;
+    font-style: italic;
+    font-family: 'Segoe UI', 'Helvetica Neue';
+}

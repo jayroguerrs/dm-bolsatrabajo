@@ -30,11 +30,14 @@ import { EventoService } from 'app/core/services/evento.service';
 import { IEventoCombo, IEventoFiltroCombo } from 'app/core/interfaces/iEvento';
 import { IFormulario, IFormularioFiltro, IFormularioFiltroPaginado } from 'app/core/interfaces/iFormulario';
 import { Router } from '@angular/router';
+import { PuestosService } from 'app/core/services/puestos.service';
+import { IPuestos, IPuestosFiltroPaginado, IPuestosFiltroPaginadoNoCaptcha } from 'app/core/interfaces/iPuestos';
+import { GestionConvocatoriasComponent } from './gestion-convocatoria/gestion-convocatoria.component';
 
 @Component({
-    selector        : 'listar-formulario',
-    templateUrl     : './listar-formulario.component.html',
-    styleUrls       : ['./listar-formulario.component.scss'],
+    selector        : 'convocatorias',
+    templateUrl     : './convocatorias.component.html',
+    styleUrls       : ['./convocatorias.component.scss'],
     encapsulation   : ViewEncapsulation.None,
     standalone: true,
     providers: [
@@ -64,19 +67,18 @@ import { Router } from '@angular/router';
     ],
 
 })
-export class ListarFormularioComponent implements OnInit, AfterViewInit {
-    columnasTabla: string[] = ['acciones', 'titulo', 'evento', 'estado', 'fechaCreacion', 'responsable' ];
+export class ConvocatoriasComponent implements OnInit, AfterViewInit {
+    columnasTabla: string[] = ['acciones', 'titulo', 'estado', 'fechaCreacion', 'responsable' ];
     @ViewChild(MatSort, { static: true }) sort: MatSort;
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     dataSource: GrillaPaginado;
-    filtro: IFormularioFiltroPaginado;
+    filtro: IPuestosFiltroPaginadoNoCaptcha;
     lstEstado: ICatalogoDetalle[] = [];
-    lstEvento: IEventoCombo[] = [];
     lstCatalogoDetalle: ICatalogoDetalle[] = [];
-    frmUsuario: UntypedFormGroup;
+    frmPuestos: UntypedFormGroup;
 
     constructor(
-        private formularioService: FormularioService,
+        private puestosService: PuestosService,
         private catalogoDetalleService: CatalogoDetalleService,
         private eventoService: EventoService,
         private mensajesService: MensajesService,
@@ -87,13 +89,12 @@ export class ListarFormularioComponent implements OnInit, AfterViewInit {
     {}
 
     ngOnInit(): void {
-        this.frmUsuario = this._formBuilder.group({
+        this.frmPuestos = this._formBuilder.group({
+            fechareg: [''],
             titulo: [''],
-            estado: [''],
-            evento: [-1],
+            estado : ['']
         });
 
-        this.listarEvento();
         this.listarEstado();
         this.inicializarDataGrid();
     }
@@ -109,37 +110,18 @@ export class ListarFormularioComponent implements OnInit, AfterViewInit {
     }
 
     verFormulario(vId?: number ): void {
-        debugger;
-        this.router.navigate(['formulario/listar-formulario/' + vId.toString()]);
+        this.router.navigate(['admin/formulario/agregar/' + vId.toString()]);
     }
 
-    asociar(vId?: number, vNombres?: string) {
-        let textoTitulo: string = "Asociar Rol";
+    agregarFormulario(): void {
+        this.router.navigate(['admin/formulario/agregar']);
+    }
 
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-        dialogConfig.width = "50%";
-        dialogConfig.minWidth = "360px";
-        dialogConfig.data = {
-            titulo: textoTitulo,
-            Id: vId,
-            Nombres : vNombres
-        };
+    respuestas(vId: number, vTitulo: string): void {
+        // Guardar en localStorage para persistencia
+        localStorage.setItem('titulo_respuesta', vTitulo);
 
-        /*
-        const dialogRef = this._matDialog.open(GestionRolesComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (data) => {
-                if (data?.success) {
-                    this.filtro.SortColumn = "fechaCreacion";
-                    this.filtro.SortOrder = "desc";
-                    this.dataSource.listar(this.filtro);
-                    this.mensajesService.msgSuccessMixin('Datos actualizados correctamente', "");
-                }
-            }
-        );
-        */
+        this.router.navigate(['admin/formulario/listar-respuestas/' + vId.toString()], { state: { titulo: vTitulo } });
     }
 
     inicializarDataGrid() {
@@ -149,11 +131,12 @@ export class ListarFormularioComponent implements OnInit, AfterViewInit {
             TamanioPagina: 10,
             SortOrder: "",
             SortColumn: "",
-            EventoId: -1,
             Titulo: "",
+            Ubicacion: "",
+            FechaRegistro: null,
             Estado: -1
         }
-        this.dataSource = new GrillaPaginado(this.formularioService, this.mensajesService);
+        this.dataSource = new GrillaPaginado(this.puestosService, this.mensajesService);
         this.dataSource.listar(this.filtro);
     }
 
@@ -165,8 +148,9 @@ export class ListarFormularioComponent implements OnInit, AfterViewInit {
             SortOrder: this.sort.direction,
             SortColumn: this.sort.active,
             Titulo: this.filtro.Titulo,
-            EventoId: this.filtro.EventoId,
-            Estado: this.filtro.Estado
+            Ubicacion: this.filtro.Ubicacion,
+            Estado: this.filtro.Estado,
+            FechaRegistro: this.filtro.FechaRegistro,
         }
         this.dataSource.listar(this.filtro);
     }
@@ -176,36 +160,6 @@ export class ListarFormularioComponent implements OnInit, AfterViewInit {
         this.filtro.SortOrder = this.sort.direction;
         this.filtro.SortColumn = this.sort.active;
         this.dataSource.listar(this.filtro);
-    }
-
-    listarEvento() {
-        let filtro = {
-            Estado: -1
-        } as IEventoFiltroCombo;
-        this.eventoService.listarCmb(filtro)
-            .subscribe((response) => {
-                if (response.success) {
-                    let lstEvento = [];
-                    let iTodos = {
-                        Id: -1,
-                        Nombre: "-- TODOS --"
-                    } as IEventoCombo;
-                    lstEvento.push(iTodos);
-
-                    response.data.forEach(function (item) {
-                        lstEvento.push(item);
-                    })
-                    this.lstEvento = lstEvento;
-                }
-                else {
-                    this.lstEvento = [];
-                }
-                this.mensajesService.msgAutoClose();
-            },
-            (error: any) => {
-                this.mensajesService.msgError("No se pudieron cargar los registros");
-                this.mensajesService.msgAutoClose();
-            });
     }
 
     listarEstado() {
@@ -236,36 +190,35 @@ export class ListarFormularioComponent implements OnInit, AfterViewInit {
             });
     }
 
-    notificar(usuarioId : number) : void{
-
-    }
-
-    listarResumen() {
+    listarResumen(est: number = 0) {
 
         this.paginator.firstPage();
-        this.filtro.Estado = this.Estado.value;
+        this.filtro.FechaRegistro = this.FechaRegistro.value;
         this.filtro.Titulo = this.Titulo.value;
-        this.filtro.EventoId = this.Evento.value;
+        //this.filtro.Ubicacion = this.Ubicacion.value;
+        this.filtro.Estado = this.Estado.value;
+
         this.dataSource.listar(this.filtro);
     };
 
-    link() : void {
+    link(vLink?: string) {
 
     }
 
     limpiar() {
-        this.Estado.setValue("");
-        this.Evento.setValue(-1);
+        this.FechaRegistro.setValue("");
         this.Titulo.setValue("");
+        this.Estado.setValue("");
         this.paginator.pageSize = this.filtro.TamanioPagina;
-        this.listarResumen();
+        this.listarResumen(1);
     }
 
     eliminar(vId?: number) {
+        /*
         if (vId != undefined && vId > 0) {
             this.mensajesService.msgConfirm("¿Está seguro de eliminar el registro?", () => {
                 this.mensajesService.msgLoad("Procesando...");
-                this.formularioService.eliminar({ Id: vId }).subscribe((respuesta: { success: boolean; }) => {
+                this.puestosService.eliminar({ Id: vId }).subscribe((respuesta: { success: boolean; }) => {
                     if (respuesta.success) {
                         this.listarResumen();
                         this.mensajesService.msgSuccessMixin('Eliminado Correctamente', "");
@@ -279,9 +232,11 @@ export class ListarFormularioComponent implements OnInit, AfterViewInit {
                     })
             });
         }
+        */
     }
 
     ReporteExcel() {
+        /*
         if (this.dataSource.totalItems === 0) {
             this.mensajesService.msgExportarVacio;
         } else {
@@ -312,9 +267,11 @@ export class ListarFormularioComponent implements OnInit, AfterViewInit {
                 }
             });
         }
+        */
     }
 
     ReportePDF() {
+        /*
         if (this.dataSource.totalItems === 0) {
             this.mensajesService.msgExportarVacio;
         } else {
@@ -346,25 +303,71 @@ export class ListarFormularioComponent implements OnInit, AfterViewInit {
                 }
             });
         }
+        */
     }
 
-    get Evento(): any { return this.frmUsuario.get('evento'); }
-    get Titulo(): any { return this.frmUsuario.get('titulo'); }
-    get Estado(): any { return this.frmUsuario.get('estado'); }
+    abrirModalConvocatoria(vId?: number, frmDisabled?: boolean) {
+        let textoTitulo: string = "";
+        let nNuevo: boolean = false;
+
+        if (vId == 0 || vId == null || vId == undefined) {
+            textoTitulo = "Crear Convocatoria";
+            nNuevo = true;
+        } else {
+            textoTitulo = "Editar Convocatoria";
+        }
+
+        if (frmDisabled) {
+            textoTitulo = "Visualizar Convocatoria";
+        }
+
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.disableClose = true;
+        dialogConfig.autoFocus = true;
+        dialogConfig.width = "60%";
+        dialogConfig.minWidth = "360px";
+        dialogConfig.data = {
+            titulo: textoTitulo,
+            nNuevo: nNuevo,
+            frmDisabled: frmDisabled,
+            Id: vId,
+        };
+
+        const dialogRef = this._matDialog.open(GestionConvocatoriasComponent, dialogConfig);
+        dialogRef.afterClosed().subscribe(
+            (data) => {
+                if (data?.success) {
+                    this.filtro.SortColumn = "fechaCreacion";
+                    this.filtro.SortOrder = "desc";
+                    this.dataSource.listar(this.filtro);
+                    if (nNuevo) {
+                        this.mensajesService.msgSuccess('Datos guardados correctamente', 'aewfawe');
+                    } else {
+                        this.mensajesService.msgSuccessMixin('Datos actualizados correctamente', "");
+                    }
+                }
+            }
+        );
+    }
+
+    get FechaRegistro(): any { return this.frmPuestos.get('fechareg'); }
+    get Titulo(): any { return this.frmPuestos.get('titulo'); }
+    get Nombre(): any { return this.frmPuestos.get('nombre'); }
+    get Estado(): any { return this.frmPuestos.get('estado'); }
 }
 
-export class GrillaPaginado implements DataSource<IFormulario> {
-    private listaSubject = new BehaviorSubject<IFormulario[]>([]);
+export class GrillaPaginado implements DataSource<IPuestos> {
+    private listaSubject = new BehaviorSubject<IPuestos[]>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
     public totalItems = 0;
     public loading$ = this.loadingSubject.asObservable();
 
-    constructor(private formularioService: FormularioService, private mensajesService: MensajesService) { }
+    constructor(private puestosService: PuestosService, private mensajesService: MensajesService) { }
 
-    listar(filtro: IFormularioFiltroPaginado) {
+    listar(filtro: IPuestosFiltroPaginadoNoCaptcha) {
         this.mensajesService.msgLoad("Cargando...");
         this.loadingSubject.next(true);
-        this.formularioService.listarPaginado(filtro).pipe(
+        this.puestosService.listarPaginadoNoCaptcha(filtro).pipe(
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false)))
             .subscribe((response: any) => {
@@ -384,7 +387,7 @@ export class GrillaPaginado implements DataSource<IFormulario> {
         this.mensajesService.msgAutoClose();
     }
 
-    connect(collectionViewer: CollectionViewer): Observable<IFormulario[]> {
+    connect(collectionViewer: CollectionViewer): Observable<IPuestos[]> {
         return this.listaSubject.asObservable();
     }
 

@@ -17,6 +17,8 @@ import { PuestosService } from 'app/core/services/puestos.service';
 import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuseCardComponent } from '@fuse/components/card';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { PostulacionComponent } from './postulacion/postulacion.component';
 
 @Component({
     selector    : 'gestion-puestos',
@@ -64,7 +66,8 @@ export class GestionPuestosComponent
         private _formBuilder: FormBuilder,
         private mensajesService: MensajesService,
         private puestosService: PuestosService,
-        private router: Router
+        private router: Router,
+        private _matDialog: MatDialog,
     )
     {
         this.id = parseInt(this.rutaActiva.snapshot.params.id);
@@ -103,7 +106,21 @@ export class GestionPuestosComponent
             });
     }
 
-    postular(vId: number): void {
+    postular(): void {
 
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.disableClose = true;
+        dialogConfig.autoFocus = true;
+        dialogConfig.width = "50%";
+        dialogConfig.minWidth = "360px";
+        dialogConfig.data = {
+            Id: this.id,
+        };
+
+        const dialogRef = this._matDialog.open(PostulacionComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe((result) => {
+
+        });
     }
 }

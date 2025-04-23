@@ -4,7 +4,7 @@ import { environment } from "environments/environments";
 import { Observable } from "rxjs";
 import { StatusResponse } from "./StatusResponse.model";
 
-import { IPuestos, IPuestosFiltroPaginado, IPuestosFiltro, IPuestosFiltroPorIdDto } from "../interfaces/iPuestos";
+import { IPuestos, IPuestosFiltroPaginado, IPuestosFiltro, IPuestosFiltroPorIdDto, IPuestosFiltroPaginadoNoCaptcha } from "../interfaces/iPuestos";
 import { AuthService } from "../auth/auth.service";
 
 @Injectable({
@@ -19,20 +19,21 @@ export class PuestosService {
     }
 
     listarPaginado(request: IPuestosFiltroPaginado): Observable<StatusResponse<IPuestos[]>> {
-        let params = new HttpParams();
-        if (request.FechaRegistro) {
-            params = params.append('FechaRegistro', request.FechaRegistro.toISOString());
-        }
-        params = params.append('Estado', request.Estado);
-        params = params.append('Ubicacion', request.Ubicacion);
-        if (request.SortColumn == undefined) request.SortColumn = '';
-        if (request.SortOrder == undefined) request.SortOrder = '';
-        params = params.append('NumeroPagina', request.NumeroPagina.toString());
-        params = params.append('TamanioPagina', request.TamanioPagina.toString());
-        params = params.append('SortColumn', request.SortColumn.toString());
-        params = params.append('SortOrder', request.SortOrder.toString());
 
-        return this.http.get<StatusResponse<IPuestos[]>>(`${this.API_URL}/listarPaginado`, { params });
+        if (request.FechaRegistro) {
+            request.FechaRegistro = new Date(request.FechaRegistro).toISOString().split('T')[0] as unknown as Date;
+        }
+
+        return this.http.post<StatusResponse<IPuestos[]>>(`${this.API_URL}/listarPaginado`, request );
+    }
+
+    listarPaginadoNoCaptcha(request: IPuestosFiltroPaginadoNoCaptcha): Observable<StatusResponse<IPuestos[]>> {
+
+        if (request.FechaRegistro) {
+            request.FechaRegistro = new Date(request.FechaRegistro).toISOString().split('T')[0] as unknown as Date;
+        }
+
+        return this.http.post<StatusResponse<IPuestos[]>>(`${this.API_URL}/listarPaginadoNoCaptcha`, request );
     }
 
     ObtenerPorId(request: IPuestosFiltroPorIdDto): Observable<StatusResponse<IPuestos>> {
@@ -41,6 +42,9 @@ export class PuestosService {
         return this.http.get<StatusResponse<IPuestos>>(`${this.API_URL}/obtenerPorId`, { params });
     }
 
+    postular(formData: FormData): Observable<StatusResponse<boolean>> {
+        return this.http.post<StatusResponse<boolean>>(`${this.API_URL}/postular`, formData );
+    }
 
     /**
      * Descarga Excel o PDF

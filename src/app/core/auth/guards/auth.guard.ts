@@ -21,7 +21,6 @@ export const AuthGuard: CanActivateFn | CanActivateChildFn = (route : ActivatedR
         .pipe(
             switchMap((authenticated) => {
                 // If the user is not authenticated...
-                debugger;
                 if (!authenticated) {
                     // Redirect to the sign-in page with a redirectUrl param
                     const redirectURL =

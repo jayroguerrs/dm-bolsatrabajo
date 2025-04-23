@@ -1,7 +1,8 @@
 export const environment = {
     production: true,
     token: "",
-    apiURL: 'https://servicios-dmforms.derrama.org.pe',
+    recaptchaSiteKey: '6Ldw2BIrAAAAAKsfRRFiZPI3N8yopIqSkOfJT8_8',
+    apiURL: 'https://dmbolsadetrabajo.derrama.org.pe',
     apiFront: 'https://dmbolsadetrabajo.derrama.org.pe',
     mensajesError: {
         sinConexion: 'Valide que su conexión a la red este activa.',

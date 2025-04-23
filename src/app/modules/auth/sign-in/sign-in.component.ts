@@ -97,7 +97,6 @@ export class AuthSignInComponent implements OnInit {
         this._authService.signIn(this.signInForm.value)
             .subscribe((response) => {
                 if (response.success) {
-                    debugger;
                     this._authService.obtenerCargaInicial(response.data.user.id)
                         .subscribe((response) => {
                             const redirectURL =

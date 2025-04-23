@@ -45,7 +45,6 @@ export const authInterceptor = (
     // Response
     return next(newReq).pipe(
         catchError((error) => {
-            debugger;
             // Catch "401 Unauthorized" responses
             if (error instanceof HttpErrorResponse && error.status === 401) {
                 // Sign out

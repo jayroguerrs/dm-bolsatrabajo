@@ -2,7 +2,7 @@ import { Routes } from "@angular/router";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import { UsuariosComponent } from "./usuarios/usuarios.component";
 import { CatalogoDetalleComponent } from "./maestras/catalogo-detalle/catalogo-detalle.component";
-import { ListarFormularioComponent } from "./formulario/listar-formulario/listar-formulario.component";
+import { ConvocatoriasComponent } from "./bolsa/convocatorias/convocatorias.component";
 
 export default [
     {
@@ -14,12 +14,8 @@ export default [
         component: UsuariosComponent
     },
     {
-        path: 'formulario/listar-formulario',
-        component: ListarFormularioComponent
-    },
-    {
-        path: 'formulario/listar-formulario/:Id',
-        component: ListarFormularioComponent
+        path: 'bolsa/convocatorias',
+        component: ConvocatoriasComponent
     },
     {
         path: 'maestras/catalogo-detalle',

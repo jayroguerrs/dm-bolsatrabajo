@@ -1,0 +1,184 @@
+<div class="-m-6 flex max-h-screen flex-col ">
+    <!-- Header -->
+    <div
+        class="flex h-16 flex-0 items-center justify-between bg-primary-700 pl-6 pr-3 text-on-primary sm:pl-8 sm:pr-5"
+    >
+        <div class="text-lg font-medium">{{titulo}}</div>
+        <button mat-icon-button (click)="saveAndClose()" [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x-mark'"
+            ></mat-icon>
+        </button>
+    </div>
+
+    <!-- Compose form -->
+    <form
+        class="flex flex-auto flex-col overflow-y-auto p-6 sm:p-8 flex-grow"
+        [formGroup]="puestoForm"
+    >
+        <div class="mt-4 grid w-full gap-4 md:grid-cols-4">
+            <!-- Titulo -->
+            <div class="md:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Título</mat-label>
+                    <input matInput [formControlName]="'titulo'"
+                        [class.componentes-deshabilitados]="puestoForm.get('titulo').disabled"
+                    />
+                    @if (puestoForm.get('titulo').hasError('required')) {
+                        <mat-error> El título es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Descripción -->
+            <div class="md:col-span-4 mt-8">
+                <mat-label class="font-medium">Descripción</mat-label>
+                <quill-editor
+                    class="w-full"
+                    [styles]="{ height: 'auto', minHeight: '30px' }"
+                    [placeholder]="'Ingrese la descripción del formulario'"
+                    [formControlName]="'descripcion'"
+                    [bounds]="'self'"
+                    [modules]="quillModules"
+                ></quill-editor>
+            </div>
+
+             <!-- Rango de Fecha -->
+             <div class="md:col-span-4">
+                <mat-form-field
+                    class="w-full">
+                    <mat-label class="titulo-etiquetas">Periodo de Emisión</mat-label>
+                    <mat-date-range-input formGroupName="rangofecha" [rangePicker]="rangofecha">
+                        <input type="text" formControlName="fechainicio" matStartDate placeholder="Fecha de Inicio" formatDate maxlength="10" matInput>
+                        <input type="text" formControlName="fechafin" matEndDate placeholder="Fecha de Fin" formatDate maxlength="10" matInput>
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matIconSuffix [for]="rangofecha"></mat-datepicker-toggle>
+                    <mat-date-range-picker #rangofecha></mat-date-range-picker>
+                </mat-form-field>
+            </div>
+
+            <!-- Departamento -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Departamento</mat-label>
+                    <mat-select formControlName="departamento"
+                        [class.componentes-deshabilitados]="puestoForm.get('departamento').disabled"
+                    >
+                        <mat-option *ngFor="let objDepartamento of lstDepartamento" [value]="objDepartamento.Codigo">
+                            {{objDepartamento.Nombre }}
+                        </mat-option>
+                    </mat-select>
+                    @if (puestoForm.get('departamento').hasError('required')) {
+                        <mat-error> El departamento es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Distrito -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Distrito</mat-label>
+                    <mat-select formControlName="distrito"
+                        [class.componentes-deshabilitados]="puestoForm.get('distrito').disabled"
+                    >
+                        <mat-option *ngFor="let objDistrito of lstDistrito" [value]="objDistrito.Codigo">
+                            {{objDistrito.Nombre }}
+                        </mat-option>
+                    </mat-select>
+                    @if (puestoForm.get('distrito').hasError('required')) {
+                        <mat-error> El Distrito es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Nombres-->
+            <div class="md:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Nombres</mat-label>
+                    <input [onlyLetter]="true" matInput [formControlName]="'nombres'" maxlength="50"
+                        [class.componentes-deshabilitados]="usuarioForm.get('nombres').disabled"
+                    />
+                    @if (usuarioForm.get('nombres').hasError('required')) {
+                        <mat-error> El nombres es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Correo -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Correo electrónico</mat-label>
+                    <input matInput [formControlName]="'correo'" maxlength="50"
+                        [class.componentes-deshabilitados]="usuarioForm.get('correo').disabled"
+                    />
+                    @if (usuarioForm.get('correo').hasError('required')) {
+                        <mat-error> El correo es necesario </mat-error>
+                    } @else if (usuarioForm.get('correo').hasError('email')) {
+                        <mat-error> El correo no es válido </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Código -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Código</mat-label>
+                    <input matInput [formControlName]="'codigo'" maxlength="50"
+                        [class.componentes-deshabilitados]="usuarioForm.get('codigo').disabled"
+                    />
+                    @if (usuarioForm.get('codigo').hasError('required')) {
+                        <mat-error> El código es necesario </mat-error>
+                    } @else if (usuarioForm.get('codigo').hasError('pattern')) {
+                        <mat-error> El código no es válido </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Estado -->
+            <div class="md:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Estado</mat-label>
+                    <mat-select formControlName="estado"
+                        [class.componentes-deshabilitados]="usuarioForm.get('estado').disabled"
+                    >
+                        <mat-option *ngFor="let objEstado of lstEstado" [value]="objEstado.Codigo">
+                            {{objEstado.Nombre }}
+                        </mat-option>
+                    </mat-select>
+                    @if (usuarioForm.get('estado').hasError('required')) {
+                        <mat-error> El estado es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div
+            class="mt-4 flex flex-col justify-end sm:mt-6 sm:flex-row sm:items-center"
+        >
+            <div class="mt-4 flex items-center sm:mt-0">
+                <!-- Cancelar -->
+                <button
+                    class="sm:mx-3"
+                    mat-stroked-button
+                    (click)="matDialogRef.close()"
+                >
+                    <span>Cancelar</span>
+                </button>
+                <!-- Guardar -->
+                @if (!frmDisabled){
+                    <button
+                        [disabled]="usuarioForm.invalid  || nNuevo"
+                        class="order-first sm:order-last"
+                        mat-flat-button
+                        [color]="'primary'"
+                        (click)="guardar()"
+                    >
+                        Guardar
+                    </button>
+                }
+            </div>
+        </div>
+    </form>
+</div>

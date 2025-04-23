@@ -11,9 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MensajesService } from 'app/core/services/messages.service';
-import { FormularioService } from 'app/core/services/formulario.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { IFormularioRespuesta, RespuestaDto } from 'app/core/interfaces/iFormulario';
 import { DynamicDatepickerComponent } from 'app/shared/components/dynamic-datepicker/dynamic-datepicker.component';
 import { OnlyNumberDirective } from 'app/core/directives/onlyNumber.directive';
 import { FuseCardComponent } from '@fuse/components/card';
@@ -26,6 +24,23 @@ import { PuestosService } from 'app/core/services/puestos.service';
 import { MatTableModule } from '@angular/material/table';
 import { MyCustomPaginatorIntl } from 'app/getPaginatorIntl';
 import { Router } from '@angular/router';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
+import { environment } from 'environments/environments';
+import { ReCaptchaV3Service, RecaptchaFormsModule, RecaptchaModule } from 'ng-recaptcha';
+import { RecaptchaService } from 'app/core/services/recaptcha.service';
+
+const DATE_MODE_FORMATS = {
+    parse: {
+        dateInput: 'DD/MM/YYYY',
+    },
+    display: {
+        dateInput: 'DD/MM/YYYY',
+        monthYearLabel: 'MMM YYYY',
+        dateA11yLabel: 'LL',
+        monthYearA11yLabel: 'MMMM YYYY',
+    }
+};
 
 @Component({
     selector    : 'puestos',
@@ -36,7 +51,14 @@ import { Router } from '@angular/router';
     providers: [
         { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'fill' }, },
         { provide: MatPaginatorIntl, useClass: MyCustomPaginatorIntl },
-        { provide: DatePipe }
+        { provide: DatePipe },
+        { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+        {
+            provide: DateAdapter,
+            useClass: MomentDateAdapter,
+            deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
+        },
+        { provide: MAT_DATE_FORMATS, useValue: DATE_MODE_FORMATS }
     ],
     imports      : [
         CommonModule,
@@ -56,6 +78,8 @@ import { Router } from '@angular/router';
         MatSortModule,
         TextFieldModule,
         ReactiveFormsModule,
+        RecaptchaModule,
+        RecaptchaFormsModule,
         OnlyNumberDirective,
     ],
     animations: [
@@ -71,13 +95,18 @@ import { Router } from '@angular/router';
 })
 export class PuestosComponent
 {
-    columnasTabla: string[] = [ 'titulo', 'fechafin', 'ubicacion' ];
+    columnasTabla: string[] = [ 'titulo', 'fechaCreacion', 'fechafin', 'ubicacion' ];
     @ViewChild(MatSort, { static: true }) sort: MatSort;
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     dataSource: GrillaPaginado;
     filtro: IPuestosFiltroPaginado;
     frmPuestos: UntypedFormGroup;
     selectedRow: IPuestos;
+    public recaptchaSiteKey = environment.recaptchaSiteKey; // Usa tu site key de environment
+    public recaptchaToken: string | null = null;
+    public isRecaptchaLoaded = false;
+    //dataSource: GrillaPaginado = new GrillaPaginado(this.puestosService, this.mensajesService);
+    loading$: Observable<boolean>;
 
     /**
      * Constructor
@@ -86,15 +115,17 @@ export class PuestosComponent
         private _formBuilder: FormBuilder,
         private mensajesService: MensajesService,
         private puestosService: PuestosService,
-        private router: Router
+        private router: Router,
+        private recaptchaService: RecaptchaService
     )
     {
+        //this.loading$ = this.dataSource.loading$;
+        //this.recaptchaService.executeRecaptcha().catch(() => {});
     }
 
     ngOnInit(): void {
 
         this.frmPuestos = this._formBuilder.group({
-            //estado: [''],
             fechareg: [''],
             titulo: [''],
             ubicacion : ['']
@@ -102,6 +133,14 @@ export class PuestosComponent
 
         this.inicializarDataGrid();
 
+    }
+
+    limpiar() {
+        this.Ubicacion.setValue("");
+        this.FechaRegistro.setValue("");
+        this.Titulo.setValue("");
+        this.paginator.pageSize = this.filtro.TamanioPagina;
+        this.listarResumen(1);
     }
 
     ngAfterViewInit(): void {
@@ -124,12 +163,16 @@ export class PuestosComponent
             Titulo: this.filtro.Titulo,
             Ubicacion: this.filtro.Ubicacion,
             Estado: this.filtro.Estado,
-            FechaRegistro: this.filtro.FechaRegistro
+            FechaRegistro: this.filtro.FechaRegistro,
+            RecaptchaToken: ""
         }
+
         this.dataSource.listar(this.filtro);
+
     }
 
     inicializarDataGrid() {
+
         this.paginator.firstPage();
         this.filtro = {
             NumeroPagina: 1,
@@ -139,10 +182,12 @@ export class PuestosComponent
             Titulo: "",
             Ubicacion: "",
             FechaRegistro: null,
-            Estado: -1
+            Estado: -1,
+            RecaptchaToken: ""
         }
-        this.dataSource = new GrillaPaginado(this.puestosService, this.mensajesService);
+        this.dataSource = new GrillaPaginado(this.puestosService, this.mensajesService, this.recaptchaService);
         this.dataSource.listar(this.filtro);
+
     }
 
     abrirPostulacion(row: IPuestos) {
@@ -157,14 +202,17 @@ export class PuestosComponent
         this.dataSource.listar(this.filtro);
     }
 
-    listarResumen() {
+    listarResumen(est: number = 0) {
+
         this.paginator.firstPage();
         this.filtro.FechaRegistro = this.FechaRegistro.value;
         this.filtro.Titulo = this.Titulo.value;
         this.filtro.Ubicacion = this.Ubicacion.value;
         this.filtro.Estado = -1;
+        this.filtro.RecaptchaToken = '';
 
         this.dataSource.listar(this.filtro);
+
     };
 
     get FechaRegistro(): any { return this.frmPuestos.get('fechareg'); }
@@ -180,29 +228,46 @@ export class GrillaPaginado implements DataSource<IPuestos> {
     public totalItems = 0;
     public loading$ = this.loadingSubject.asObservable();
 
-    constructor(private puestosService: PuestosService, private mensajesService: MensajesService) { }
+    constructor(
+        private puestosService: PuestosService,
+        private mensajesService: MensajesService,
+        private recaptchaService: RecaptchaService
+    ) { }
 
-    listar(filtro: IPuestosFiltroPaginado) {
-        this.mensajesService.msgLoad("Cargando...");
-        this.loadingSubject.next(true);
-        this.puestosService.listarPaginado(filtro).pipe(
-                catchError(() => of([])),
-                finalize(() => this.loadingSubject.next(false)))
-            .subscribe((response: any) => {
-                if (response.success) {
-                    this.listaSubject.next(response.data.lista);
-                    this.totalItems = response.data.Total;
-                }
-                else {
-                    this.listaSubject.next([]);
-                    this.totalItems = 0;
-                    this.loadingSubject.next(false)
-                }
-            },
-                (error: any) => {
-                    this.loadingSubject.next(false)
-                });
-        this.mensajesService.msgAutoClose();
+    async listar(filtro: IPuestosFiltroPaginado, est: number = 0) {
+
+        try{
+
+            this.mensajesService.msgLoad("Cargando...");
+            this.loadingSubject.next(true);
+
+            const token = await this.recaptchaService.executeRecaptcha('submit');
+            filtro.RecaptchaToken = token;
+
+            this.puestosService.listarPaginado(filtro).pipe(
+                    catchError(() => of([])),
+                    finalize(() => this.loadingSubject.next(false)))
+                .subscribe((response: any) => {
+                    if (response.success) {
+                        this.listaSubject.next(response.data.lista);
+                        this.totalItems = response.data.Total;
+                        est == 1 ? this.mensajesService.msgSuccessMixin("Filtros aplicados correctamente", "") : "";
+                    } else {
+                        this.listaSubject.next([]);
+                        this.totalItems = 0;
+                        this.loadingSubject.next(false)
+                        this.mensajesService.msgError("Error: " + response.validations[0].message);
+                    }
+                },
+                    (error: any) => {
+                        this.loadingSubject.next(false)
+                    });
+            this.mensajesService.msgAutoClose();
+
+        } catch (error) {
+            this.loadingSubject.next(false);
+            this.mensajesService.msgError("Error en reCAPTCHA");
+        }
     }
 
     connect(collectionViewer: CollectionViewer): Observable<IPuestos[]> {

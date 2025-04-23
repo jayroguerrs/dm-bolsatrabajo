@@ -1,0 +1,169 @@
+<div class="-m-6 flex max-h-screen max-w-240 flex-col ">
+    <!-- Header -->
+    <div
+        class="flex h-16 flex-0 items-center justify-between bg-primary-700 pl-6 pr-3 text-on-primary sm:pl-8 sm:pr-5"
+    >
+        <div class="text-lg font-medium">Postulacion</div>
+        <button mat-icon-button (click)="saveAndClose()" [tabIndex]="-1">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x-mark'"
+            ></mat-icon>
+        </button>
+    </div>
+
+    <!-- Compose form -->
+    <form
+        class="flex flex-auto flex-col overflow-y-auto p-6 sm:p-8 flex-grow"
+        [formGroup]="postulacionForm"
+    >
+        <div class="mt-8 grid w-full gap-3 sm:grid-cols-4">
+            <!-- Nombres -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Nombres</mat-label>
+                    <input [onlyNumber]="false" matInput [formControlName]="'nombres'" maxlength="80"
+                    />
+                    @if (postulacionForm.get('nombres').hasError('required')) {
+                        <mat-error> El nombre es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Apellido Paterno -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Apellido Paterno</mat-label>
+                    <input [onlyNumber]="false" matInput [formControlName]="'paterno'" maxlength="80"
+                    />
+                    @if (postulacionForm.get('paterno').hasError('required')) {
+                        <mat-error> El apellido paterno es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Apellido Materno -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Apellido Materno</mat-label>
+                    <input [onlyNumber]="false" matInput [formControlName]="'materno'" maxlength="80"
+                        [class.componentes-deshabilitados]="postulacionForm.get('materno').disabled"
+                    />
+                    @if (postulacionForm.get('materno').hasError('required')) {
+                        <mat-error> El apellido materno es necesario </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Tipo de Documento -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Tipo de Documento</mat-label>
+                    <mat-select [formControlName]="'tipodoc'"
+                        [class.componentes-deshabilitados]="postulacionForm.get('tipodoc').disabled"
+                    >
+                        <mat-option *ngFor="let objTipoDoc of lstTipoDoc" [value]="objTipoDoc.Id">
+                            {{objTipoDoc.Nombre }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <!-- DNI -->
+            <div class="sm:col-span-2">
+                <mat-form-field class="w-full">
+                    <mat-label>Documento de Identidad</mat-label>
+                    <input [onlyNumber]="true" matInput [formControlName]="'dni'" maxlength="8"
+                        [class.componentes-deshabilitados]="postulacionForm.get('dni').disabled"
+                    />
+                    @if (postulacionForm.get('dni').hasError('required')) {
+                        <mat-error> El DNI es necesario </mat-error>
+                    } @else if (postulacionForm.get('dni').hasError('pattern')) {
+                        <mat-error> El DNI solo puede contener números </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Correo -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Correo Electrónico</mat-label>
+                    <input [onlyNumber]="false" matInput [formControlName]="'correo'" maxlength="80"
+                    />
+                    @if (postulacionForm.get('correo').hasError('required')) {
+                        <mat-error> El correo electrónico es necesario </mat-error>
+                    } @else if (postulacionForm.get('correo').hasError('email')) {
+                        <mat-error> El correo electrónico no es válido </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Celular -->
+            <div class="sm:col-span-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Número de celular</mat-label>
+                    <input [onlyNumber]="true" matInput [formControlName]="'celular'" maxlength="9"
+                    />
+                    @if (postulacionForm.get('celular').hasError('required')) {
+                        <mat-error> El número de celular es necesario </mat-error>
+                    } @else if (postulacionForm.get('celular').hasError('pattern')) {
+                        <mat-error> El número de celular solo puede contener números </mat-error>
+                    } @else if (postulacionForm.get('celular').hasError('minlength')) {
+                        <mat-error> El número de celular debe tener 9 dígitos </mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- CV -->
+            <div class="w-full">
+                <mat-label>
+                    <div class="inline-block"> Ingrese su CV</div>
+                </mat-label>
+                <div class="pt-2" [formGroup]="postulacionForm">
+                    <div [formArrayName]="'documento'">
+                        <input
+                            type="file"
+                            (change)="onFileChange($event)"
+                            accept=".pdf,.doc,.docx" />
+                    </div>
+                    @if (postulacionForm.get('documento').hasError('required')) {
+                        <div class="text-red-600 mt-2">Campo obligatorio</div>
+                    } @else if (postulacionForm.get('documento').hasError('fileType')) {
+                        <div class="text-red-600 mt-2">Solo se permiten archivos PDF o Word. </div>
+                    } @else if (postulacionForm.get('documento').hasError('fileSize')) {
+                        <div class="text-red-600 mt-2">El archivo no debe superar los 10 MB.</div>
+                    } @else if (postulacionForm.get('documento').hasError('maxFiles')) {
+                        <div class="text-red-600 mt-2"> Se permite 1 archivo como máximo.</div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div
+            class="mt-4 flex flex-col justify-end sm:mt-6 sm:flex-row sm:items-center"
+        >
+            <div class="mt-4 flex items-center sm:mt-0">
+                <!-- Cancelar -->
+                <button
+                    class="sm:mx-3"
+                    mat-stroked-button
+                    (click)="matDialogRef.close()"
+                >
+                    <span>Cancelar</span>
+                </button>
+                <!-- Guardar -->
+                <button
+                    [disabled]="postulacionForm.invalid "
+                    class="order-first sm:order-last"
+                    mat-flat-button
+                    [color]="'primary'"
+                    (click)="guardar()"
+                >
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

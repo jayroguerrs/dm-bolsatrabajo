@@ -1,6 +1,7 @@
 export const environment = {
     production: false,
     token: "",
+    recaptchaSiteKey: '6Ldw2BIrAAAAAKsfRRFiZPI3N8yopIqSkOfJT8_8',
     apiURL: 'http://localhost:5214',
     apiFront: 'http://localhost:4200',
     mensajesError: {
