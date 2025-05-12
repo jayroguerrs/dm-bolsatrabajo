@@ -91,7 +91,7 @@ export class GestionPuestosComponent
         let iFiltro = {
             Id: vId
         } as IPuestosFiltroPorIdDto;
-        this.puestosService.ObtenerPorId(iFiltro)
+        this.puestosService.obtenerPorId(iFiltro)
             .subscribe((response) => {
                 if (response.success) {
                     this.objPuestos = response.data;

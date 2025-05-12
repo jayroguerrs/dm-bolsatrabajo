@@ -32,7 +32,7 @@
             </div>
 
             <!-- Descripción -->
-            <div class="md:col-span-4 mt-8">
+            <div class="md:col-span-4">
                 <mat-label class="font-medium">Descripción</mat-label>
                 <quill-editor
                     class="w-full"
@@ -44,8 +44,8 @@
                 ></quill-editor>
             </div>
 
-             <!-- Rango de Fecha -->
-             <div class="md:col-span-4">
+            <!-- Rango de Fecha -->
+            <div class="md:col-span-4">
                 <mat-form-field
                     class="w-full">
                     <mat-label class="titulo-etiquetas">Periodo de Emisión</mat-label>
@@ -64,8 +64,9 @@
                     <mat-label>Departamento</mat-label>
                     <mat-select formControlName="departamento"
                         [class.componentes-deshabilitados]="puestoForm.get('departamento').disabled"
+                        (selectionChange)="listarDistrito($event.value)"
                     >
-                        <mat-option *ngFor="let objDepartamento of lstDepartamento" [value]="objDepartamento.Codigo">
+                        <mat-option *ngFor="let objDepartamento of lstDepartamento" [value]="objDepartamento.DepaId">
                             {{objDepartamento.Nombre }}
                         </mat-option>
                     </mat-select>
@@ -82,7 +83,7 @@
                     <mat-select formControlName="distrito"
                         [class.componentes-deshabilitados]="puestoForm.get('distrito').disabled"
                     >
-                        <mat-option *ngFor="let objDistrito of lstDistrito" [value]="objDistrito.Codigo">
+                        <mat-option *ngFor="let objDistrito of lstDistrito" [value]="objDistrito.DistritoId">
                             {{objDistrito.Nombre }}
                         </mat-option>
                     </mat-select>
@@ -92,61 +93,18 @@
                 </mat-form-field>
             </div>
 
-            <!-- Nombres-->
-            <div class="md:col-span-4">
-                <mat-form-field class="w-full">
-                    <mat-label>Nombres</mat-label>
-                    <input [onlyLetter]="true" matInput [formControlName]="'nombres'" maxlength="50"
-                        [class.componentes-deshabilitados]="usuarioForm.get('nombres').disabled"
-                    />
-                    @if (usuarioForm.get('nombres').hasError('required')) {
-                        <mat-error> El nombres es necesario </mat-error>
-                    }
-                </mat-form-field>
-            </div>
-
-            <!-- Correo -->
-            <div class="md:col-span-2">
-                <mat-form-field class="w-full">
-                    <mat-label>Correo electrónico</mat-label>
-                    <input matInput [formControlName]="'correo'" maxlength="50"
-                        [class.componentes-deshabilitados]="usuarioForm.get('correo').disabled"
-                    />
-                    @if (usuarioForm.get('correo').hasError('required')) {
-                        <mat-error> El correo es necesario </mat-error>
-                    } @else if (usuarioForm.get('correo').hasError('email')) {
-                        <mat-error> El correo no es válido </mat-error>
-                    }
-                </mat-form-field>
-            </div>
-
-            <!-- Código -->
-            <div class="md:col-span-2">
-                <mat-form-field class="w-full">
-                    <mat-label>Código</mat-label>
-                    <input matInput [formControlName]="'codigo'" maxlength="50"
-                        [class.componentes-deshabilitados]="usuarioForm.get('codigo').disabled"
-                    />
-                    @if (usuarioForm.get('codigo').hasError('required')) {
-                        <mat-error> El código es necesario </mat-error>
-                    } @else if (usuarioForm.get('codigo').hasError('pattern')) {
-                        <mat-error> El código no es válido </mat-error>
-                    }
-                </mat-form-field>
-            </div>
-
             <!-- Estado -->
             <div class="md:col-span-2">
                 <mat-form-field class="w-full">
                     <mat-label>Estado</mat-label>
                     <mat-select formControlName="estado"
-                        [class.componentes-deshabilitados]="usuarioForm.get('estado').disabled"
+                        [class.componentes-deshabilitados]="puestoForm.get('estado').disabled"
                     >
                         <mat-option *ngFor="let objEstado of lstEstado" [value]="objEstado.Codigo">
                             {{objEstado.Nombre }}
                         </mat-option>
                     </mat-select>
-                    @if (usuarioForm.get('estado').hasError('required')) {
+                    @if (puestoForm.get('estado').hasError('required')) {
                         <mat-error> El estado es necesario </mat-error>
                     }
                 </mat-form-field>
@@ -169,7 +127,7 @@
                 <!-- Guardar -->
                 @if (!frmDisabled){
                     <button
-                        [disabled]="usuarioForm.invalid  || nNuevo"
+                        [disabled]="puestoForm.invalid  || nNuevo"
                         class="order-first sm:order-last"
                         mat-flat-button
                         [color]="'primary'"

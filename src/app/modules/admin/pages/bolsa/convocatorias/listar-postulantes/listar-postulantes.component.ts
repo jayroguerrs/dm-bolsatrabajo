@@ -25,19 +25,16 @@ import { MatMenuModule } from '@angular/material/menu';
 import { OnlyLetterDirective } from 'app/core/directives/onlyLetter.directive';
 
 import * as FileSaver from 'file-saver';
-import { FormularioService } from 'app/core/services/formulario.service';
 import { EventoService } from 'app/core/services/evento.service';
 import { IEventoCombo, IEventoFiltroCombo } from 'app/core/interfaces/iEvento';
-import { IFormulario, IFormularioFiltro, IFormularioFiltroPaginado } from 'app/core/interfaces/iFormulario';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PuestosService } from 'app/core/services/puestos.service';
-import { IPuestos, IPuestosFiltroPaginado, IPuestosFiltroPaginadoNoCaptcha } from 'app/core/interfaces/iPuestos';
-import { GestionConvocatoriasComponent } from './gestion-convocatoria/gestion-convocatoria.component';
+import { IPostulantes, IPostulantesFiltro, IPostulantesFiltroPaginado } from 'app/core/interfaces/iPuestos';
 
 @Component({
-    selector        : 'convocatorias',
-    templateUrl     : './convocatorias.component.html',
-    styleUrls       : ['./convocatorias.component.scss'],
+    selector        : 'listar-postulantes',
+    templateUrl     : './listar-postulantes.component.html',
+    styleUrls       : ['./listar-postulantes.component.scss'],
     encapsulation   : ViewEncapsulation.None,
     standalone: true,
     providers: [
@@ -63,40 +60,60 @@ import { GestionConvocatoriasComponent } from './gestion-convocatoria/gestion-co
         MatTableModule,
         MatTooltipModule,
         MatSortModule,
-        OnlyLetterDirective
+        OnlyLetterDirective,
+        RouterLink
     ],
 
 })
-export class ConvocatoriasComponent implements OnInit, AfterViewInit {
-    columnasTabla: string[] = ['acciones', 'titulo', 'estado', 'fechaCreacion', 'responsable' ];
+export class ListarPostulantesComponent implements OnInit, AfterViewInit {
+    columnasTabla: string[] = ['acciones', 'id', 'fechaCreacion', 'evento', 'estado'];
     @ViewChild(MatSort, { static: true }) sort: MatSort;
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     dataSource: GrillaPaginado;
-    filtro: IPuestosFiltroPaginadoNoCaptcha;
+    filtro: IPostulantesFiltroPaginado;
     lstEstado: ICatalogoDetalle[] = [];
+    lstEvento: IEventoCombo[] = [];
     lstCatalogoDetalle: ICatalogoDetalle[] = [];
-    frmPuestos: UntypedFormGroup;
+    frmUsuario: UntypedFormGroup;
+    puestoId: number | null = null;
+    titulo: string = "";
 
     constructor(
-        private puestosService: PuestosService,
+        private postulantesService: PuestosService,
         private catalogoDetalleService: CatalogoDetalleService,
         private eventoService: EventoService,
         private mensajesService: MensajesService,
         private _formBuilder: UntypedFormBuilder,
         private _matDialog: MatDialog,
         private router: Router,
+        private activatedRoute: ActivatedRoute,
+        private route: ActivatedRoute,
     )
-    {}
+    {
+        const navigation = this.router.getCurrentNavigation();
+        if (navigation?.extras.state) {
+            this.titulo = navigation.extras.state['titulo'];
+        } else {
+            this.titulo = localStorage.getItem('titulo_respuesta');
+        }
+    }
 
     ngOnInit(): void {
-        this.frmPuestos = this._formBuilder.group({
-            fechareg: [''],
+        this.frmUsuario = this._formBuilder.group({
             titulo: [''],
-            estado : ['']
+            estado: [''],
+            evento: [-1],
         });
 
-        this.listarEstado();
-        this.inicializarDataGrid();
+        // Verificar si hay ID en la ruta
+        this.activatedRoute.params.subscribe(params => {
+            this.puestoId = params['id'] ? +params['id'] : null;
+
+            this.listarEvento();
+            this.listarEstado();
+            this.inicializarDataGrid(this.puestoId);
+        });
+
     }
 
     ngAfterViewInit(): void {
@@ -109,35 +126,23 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
             .subscribe();
     }
 
-    verFormulario(vId?: number ): void {
-        this.router.navigate(['admin/bolsa/agregar/' + vId.toString()]);
-    }
-
     agregarFormulario(): void {
-        this.router.navigate(['admin/bolsa/agregar']);
+        this.router.navigate(['admin/formulario/agregar']);
     }
 
-    postulantes(vId: number, vTitulo: string): void {
-        // Guardar en localStorage para persistencia
-        localStorage.setItem('titulo_respuesta', vTitulo);
-        debugger;
-        this.router.navigate(['admin/bolsa/listar-postulantes/' + vId.toString()], { state: { titulo: vTitulo } });
-    }
-
-
-    inicializarDataGrid() {
+    inicializarDataGrid(vId: number | null) {
         this.paginator.firstPage();
         this.filtro = {
             NumeroPagina: 1,
             TamanioPagina: 10,
             SortOrder: "",
             SortColumn: "",
-            Titulo: "",
-            Ubicacion: "",
-            FechaRegistro: null,
+            NumeroDocumento: "",
+            Nombres: "",
+            PuestoId: vId,
             Estado: -1
         }
-        this.dataSource = new GrillaPaginado(this.puestosService, this.mensajesService);
+        this.dataSource = new GrillaPaginado(this.postulantesService, this.mensajesService);
         this.dataSource.listar(this.filtro);
     }
 
@@ -148,19 +153,49 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
             TamanioPagina: this.paginator.pageSize,
             SortOrder: this.sort.direction,
             SortColumn: this.sort.active,
-            Titulo: this.filtro.Titulo,
-            Ubicacion: this.filtro.Ubicacion,
-            Estado: this.filtro.Estado,
-            FechaRegistro: this.filtro.FechaRegistro,
+            Nombres: this.filtro.Nombres,
+            NumeroDocumento: this.filtro.NumeroDocumento,
+            PuestoId: this.filtro.PuestoId,
+            Estado: this.filtro.Estado
         }
         this.dataSource.listar(this.filtro);
     }
 
-    cargarOrdenamiento() {
-
+    cargarOrdenamiento()
+    {
         this.filtro.SortOrder = this.sort.direction;
         this.filtro.SortColumn = this.sort.active;
         this.dataSource.listar(this.filtro);
+    }
+
+    listarEvento() {
+        let filtro = {
+            Estado: -1
+        } as IEventoFiltroCombo;
+        this.eventoService.listarCmb(filtro)
+            .subscribe((response) => {
+                if (response.success) {
+                    let lstEvento = [];
+                    let iTodos = {
+                        Id: -1,
+                        Nombre: "-- TODOS --"
+                    } as IEventoCombo;
+                    lstEvento.push(iTodos);
+
+                    response.data.forEach(function (item) {
+                        lstEvento.push(item);
+                    })
+                    this.lstEvento = lstEvento;
+                }
+                else {
+                    this.lstEvento = [];
+                }
+                this.mensajesService.msgAutoClose();
+            },
+            (error: any) => {
+                this.mensajesService.msgError("No se pudieron cargar los registros");
+                this.mensajesService.msgAutoClose();
+            });
     }
 
     listarEstado() {
@@ -191,35 +226,30 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
             });
     }
 
-    listarResumen(est: number = 0) {
+    listarResumen() {
 
         this.paginator.firstPage();
-        this.filtro.FechaRegistro = this.FechaRegistro.value;
-        this.filtro.Titulo = this.Titulo.value;
-        //this.filtro.Ubicacion = this.Ubicacion.value;
+        this.filtro.NumeroDocumento = this.NumDoc.value;
+        this.filtro.Nombres = this.Nombres.value;
         this.filtro.Estado = this.Estado.value;
-
+        this.filtro.PuestoId = this.puestoId;
         this.dataSource.listar(this.filtro);
     };
 
-    link(vLink?: string) {
-
-    }
-
     limpiar() {
-        this.FechaRegistro.setValue("");
-        this.Titulo.setValue("");
+        this.NumDoc.setValue("");
         this.Estado.setValue("");
+        this.Nombres.setValue("");
+        //this.ForesId.setValue("");
         this.paginator.pageSize = this.filtro.TamanioPagina;
-        this.listarResumen(1);
+        this.listarResumen();
     }
 
     eliminar(vId?: number) {
-
         if (vId != undefined && vId > 0) {
             this.mensajesService.msgConfirm("¿Está seguro de eliminar el registro?", () => {
                 this.mensajesService.msgLoad("Procesando...");
-                this.puestosService.eliminar({ Id: vId }).subscribe((respuesta: { success: boolean; }) => {
+                this.postulantesService.eliminar({Id: vId}).subscribe((respuesta: { success: boolean; }) => {
                     if (respuesta.success) {
                         this.listarResumen();
                         this.mensajesService.msgSuccessMixin('Eliminado Correctamente', "");
@@ -236,21 +266,21 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
     }
 
     ReporteExcel() {
-        /*
         if (this.dataSource.totalItems === 0) {
             this.mensajesService.msgExportarVacio;
         } else {
             this.mensajesService.msgLoad("Descargando...");
             let filtroReporte = {
-                Titulo: this.filtro.Titulo,
-                EventoId: this.filtro.EventoId,
+                NumeroDocumento: this.filtro.NumeroDocumento,
+                Nombres: this.filtro.Nombres,
+                PuestoId: this.puestoId,
                 Estado: this.filtro.Estado,
                 SortColumn : this.sort.active,
                 SortOrder : this.sort.direction
-            } as IFormularioFiltro;
+            } as IPostulantesFiltro;
 
             //1: Excel, 2: PDF
-            this.formularioService.generarReporte(filtroReporte, 1).subscribe({
+            this.postulantesService.generarPostulantesReporte(filtroReporte, 1).subscribe({
                 next: (respuesta: any) => {
                     ;
                     if (respuesta != null) {
@@ -267,26 +297,24 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
                 }
             });
         }
-        */
     }
 
     ReportePDF() {
-        /*
         if (this.dataSource.totalItems === 0) {
             this.mensajesService.msgExportarVacio;
         } else {
             this.mensajesService.msgLoad("Descargando...");
             let filtroReporte = {
-                EventoId: this.filtro.EventoId,
-                Titulo: this.filtro.Titulo,
-                Fecha: this.filtro.Fecha,
+                NumeroDocumento: this.filtro.NumeroDocumento,
+                Nombres: this.filtro.Nombres,
+                PuestoId: this.puestoId,
                 Estado: this.filtro.Estado,
                 SortColumn : this.sort.active,
                 SortOrder : this.sort.direction
-            } as IFormularioFiltro;
+            } as IPostulantesFiltro;
 
             //1: Excel, 2: PDF
-            this.formularioService.generarReporte(filtroReporte, 2).subscribe({
+            this.postulantesService.generarPostulantesReporte(filtroReporte, 2).subscribe({
                 next: (respuesta: any) => {
                     ;
                     if (respuesta != null) {
@@ -303,71 +331,25 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
                 }
             });
         }
-        */
     }
 
-    abrirModalConvocatoria(vId?: number, frmDisabled?: boolean) {
-        let textoTitulo: string = "";
-        let nNuevo: boolean = false;
-
-        if (vId == 0 || vId == null || vId == undefined) {
-            textoTitulo = "Crear Convocatoria";
-            nNuevo = true;
-        } else {
-            textoTitulo = "Editar Convocatoria";
-        }
-
-        if (frmDisabled) {
-            textoTitulo = "Visualizar Convocatoria";
-        }
-
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-        dialogConfig.width = "60%";
-        dialogConfig.minWidth = "360px";
-        dialogConfig.data = {
-            titulo: textoTitulo,
-            nNuevo: nNuevo,
-            frmDisabled: frmDisabled,
-            Id: vId,
-        };
-
-        const dialogRef = this._matDialog.open(GestionConvocatoriasComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (data) => {
-                if (data?.success) {
-                    this.filtro.SortColumn = "fechaCreacion";
-                    this.filtro.SortOrder = "desc";
-                    this.dataSource.listar(this.filtro);
-                    if (nNuevo) {
-                        this.mensajesService.msgSuccess('Datos guardados correctamente', 'aewfawe');
-                    } else {
-                        this.mensajesService.msgSuccessMixin('Datos actualizados correctamente', "");
-                    }
-                }
-            }
-        );
-    }
-
-    get FechaRegistro(): any { return this.frmPuestos.get('fechareg'); }
-    get Titulo(): any { return this.frmPuestos.get('titulo'); }
-    get Nombre(): any { return this.frmPuestos.get('nombre'); }
-    get Estado(): any { return this.frmPuestos.get('estado'); }
+    get Nombres(): any { return this.frmUsuario.get('nombres'); }
+    get NumDoc(): any { return this.frmUsuario.get('numdoc'); }
+    get Estado(): any { return this.frmUsuario.get('estado'); }
 }
 
-export class GrillaPaginado implements DataSource<IPuestos> {
-    private listaSubject = new BehaviorSubject<IPuestos[]>([]);
+export class GrillaPaginado implements DataSource<IPostulantes> {
+    private listaSubject = new BehaviorSubject<IPostulantes[]>([]);
     private loadingSubject = new BehaviorSubject<boolean>(false);
     public totalItems = 0;
     public loading$ = this.loadingSubject.asObservable();
 
     constructor(private puestosService: PuestosService, private mensajesService: MensajesService) { }
 
-    listar(filtro: IPuestosFiltroPaginadoNoCaptcha) {
+    listar(filtro: IPostulantesFiltroPaginado) {
         this.mensajesService.msgLoad("Cargando...");
         this.loadingSubject.next(true);
-        this.puestosService.listarPaginadoNoCaptcha(filtro).pipe(
+        this.puestosService.listarPostulantesPaginado(filtro).pipe(
                 catchError(() => of([])),
                 finalize(() => this.loadingSubject.next(false)))
             .subscribe((response: any) => {
@@ -387,7 +369,7 @@ export class GrillaPaginado implements DataSource<IPuestos> {
         this.mensajesService.msgAutoClose();
     }
 
-    connect(collectionViewer: CollectionViewer): Observable<IPuestos[]> {
+    connect(collectionViewer: CollectionViewer): Observable<IPostulantes[]> {
         return this.listaSubject.asObservable();
     }
 
