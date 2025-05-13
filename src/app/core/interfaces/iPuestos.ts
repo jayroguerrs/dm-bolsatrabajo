@@ -12,6 +12,7 @@ export interface IPuestosFiltroPaginado {
 
 export interface IPostulantesFiltroPaginado {
     NumeroDocumento?: string;
+    Correo?: string;
     Nombres?: string;
     PuestoId: number;
     Ubicacion?: string;
@@ -51,6 +52,10 @@ export interface IPostulantesFiltro {
     Estado: number;
     SortColumn: string;
     SortOrder: string;
+}
+
+export interface IPuestosActEstado{
+    PuestoId: number;
 }
 
 export interface IPuestos {

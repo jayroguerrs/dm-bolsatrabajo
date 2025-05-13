@@ -23,16 +23,12 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { OnlyLetterDirective } from 'app/core/directives/onlyLetter.directive';
-
-import * as FileSaver from 'file-saver';
-import { FormularioService } from 'app/core/services/formulario.service';
 import { EventoService } from 'app/core/services/evento.service';
-import { IEventoCombo, IEventoFiltroCombo } from 'app/core/interfaces/iEvento';
-import { IFormulario, IFormularioFiltro, IFormularioFiltroPaginado } from 'app/core/interfaces/iFormulario';
 import { Router } from '@angular/router';
 import { PuestosService } from 'app/core/services/puestos.service';
-import { IPuestos, IPuestosFiltroPaginado, IPuestosFiltroPaginadoNoCaptcha } from 'app/core/interfaces/iPuestos';
+import { IPuestos, IPuestosFiltroPaginadoNoCaptcha } from 'app/core/interfaces/iPuestos';
 import { GestionConvocatoriasComponent } from './gestion-convocatoria/gestion-convocatoria.component';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
 
 @Component({
     selector        : 'convocatorias',
@@ -63,6 +59,7 @@ import { GestionConvocatoriasComponent } from './gestion-convocatoria/gestion-co
         MatTableModule,
         MatTooltipModule,
         MatSortModule,
+        MatSlideToggle,
         OnlyLetterDirective
     ],
 
@@ -76,6 +73,7 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
     lstEstado: ICatalogoDetalle[] = [];
     lstCatalogoDetalle: ICatalogoDetalle[] = [];
     frmPuestos: UntypedFormGroup;
+    estado: string = "Inactivo";
 
     constructor(
         private puestosService: PuestosService,
@@ -109,21 +107,38 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
             .subscribe();
     }
 
-    verFormulario(vId?: number ): void {
-        this.router.navigate(['admin/bolsa/agregar/' + vId.toString()]);
-    }
+    cambiarEstado(request: IPuestos): void {
+        let EstadoInicial = request.Estado;
+        request.EstadoTexto = EstadoInicial == 0 ? "ACTIVO" : "INACTIVO";
+        this.mensajesService.msgConfirm("¿Está seguro de cambiar el estado del registro?", () => {
+            this.mensajesService.msgLoad("Procesando...");
 
-    agregarFormulario(): void {
-        this.router.navigate(['admin/bolsa/agregar']);
+            this.puestosService.cambiarEstado({ PuestoId: request.Id }).subscribe((respuesta: { success: boolean; }) => {
+                if (respuesta.success) {
+                    this.listarResumen();
+                    this.mensajesService.msgSuccessMixin('Estado cambiado correctamente', "");
+                }
+                else {
+                    this.mensajesService.msgError("No se pudo cambiar el estado");
+                }
+            },
+                (error: any) => {
+                    this.mensajesService.msgError("No se pudo cambiar el estado");
+                })
+        },
+        () => {
+            // Si el usuario cancela la acción, revertir el estado
+            request.Estado = EstadoInicial;
+            request.EstadoTexto = EstadoInicial == 0 ? "INACTIVO" : "ACTIVO";
+        }
+        );
     }
 
     postulantes(vId: number, vTitulo: string): void {
         // Guardar en localStorage para persistencia
         localStorage.setItem('titulo_respuesta', vTitulo);
-        debugger;
         this.router.navigate(['admin/bolsa/listar-postulantes/' + vId.toString()], { state: { titulo: vTitulo } });
     }
-
 
     inicializarDataGrid() {
         this.paginator.firstPage();
@@ -201,10 +216,6 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
 
         this.dataSource.listar(this.filtro);
     };
-
-    link(vLink?: string) {
-
-    }
 
     limpiar() {
         this.FechaRegistro.setValue("");
@@ -341,7 +352,7 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
                     this.filtro.SortOrder = "desc";
                     this.dataSource.listar(this.filtro);
                     if (nNuevo) {
-                        this.mensajesService.msgSuccess('Datos guardados correctamente', 'aewfawe');
+                        this.mensajesService.msgSuccess('Datos guardados correctamente', '');
                     } else {
                         this.mensajesService.msgSuccessMixin('Datos actualizados correctamente', "");
                     }

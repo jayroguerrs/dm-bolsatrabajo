@@ -95,7 +95,7 @@ const DATE_MODE_FORMATS = {
 })
 export class PuestosComponent
 {
-    columnasTabla: string[] = [ 'titulo', 'fechaCreacion', 'fechafin', 'ubicacion' ];
+    columnasTabla: string[] = [ 'titulo', 'fechainicio', 'fechafin', 'ubicacion' ];
     @ViewChild(MatSort, { static: true }) sort: MatSort;
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     dataSource: GrillaPaginado;

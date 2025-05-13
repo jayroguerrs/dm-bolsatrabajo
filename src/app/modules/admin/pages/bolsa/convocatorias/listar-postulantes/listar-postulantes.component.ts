@@ -30,6 +30,7 @@ import { IEventoCombo, IEventoFiltroCombo } from 'app/core/interfaces/iEvento';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PuestosService } from 'app/core/services/puestos.service';
 import { IPostulantes, IPostulantesFiltro, IPostulantesFiltroPaginado } from 'app/core/interfaces/iPuestos';
+import { environment } from 'environments/environments';
 
 @Component({
     selector        : 'listar-postulantes',
@@ -66,7 +67,7 @@ import { IPostulantes, IPostulantesFiltro, IPostulantesFiltroPaginado } from 'ap
 
 })
 export class ListarPostulantesComponent implements OnInit, AfterViewInit {
-    columnasTabla: string[] = ['acciones', 'id', 'fechaCreacion', 'evento', 'estado'];
+    columnasTabla: string[] = ['acciones', 'nombres', 'correo', 'archivo', 'estado', 'fechaCreacion'];
     @ViewChild(MatSort, { static: true }) sort: MatSort;
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     dataSource: GrillaPaginado;
@@ -100,16 +101,16 @@ export class ListarPostulantesComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         this.frmUsuario = this._formBuilder.group({
-            titulo: [''],
+            nombres: [''],
+            correo: [''],
             estado: [''],
-            evento: [-1],
+            numdoc: [''],
         });
 
         // Verificar si hay ID en la ruta
         this.activatedRoute.params.subscribe(params => {
             this.puestoId = params['id'] ? +params['id'] : null;
 
-            this.listarEvento();
             this.listarEstado();
             this.inicializarDataGrid(this.puestoId);
         });
@@ -126,10 +127,6 @@ export class ListarPostulantesComponent implements OnInit, AfterViewInit {
             .subscribe();
     }
 
-    agregarFormulario(): void {
-        this.router.navigate(['admin/formulario/agregar']);
-    }
-
     inicializarDataGrid(vId: number | null) {
         this.paginator.firstPage();
         this.filtro = {
@@ -139,6 +136,7 @@ export class ListarPostulantesComponent implements OnInit, AfterViewInit {
             SortColumn: "",
             NumeroDocumento: "",
             Nombres: "",
+            Correo: "",
             PuestoId: vId,
             Estado: -1
         }
@@ -154,6 +152,7 @@ export class ListarPostulantesComponent implements OnInit, AfterViewInit {
             SortOrder: this.sort.direction,
             SortColumn: this.sort.active,
             Nombres: this.filtro.Nombres,
+            Correo: this.filtro.Correo,
             NumeroDocumento: this.filtro.NumeroDocumento,
             PuestoId: this.filtro.PuestoId,
             Estado: this.filtro.Estado
@@ -166,36 +165,6 @@ export class ListarPostulantesComponent implements OnInit, AfterViewInit {
         this.filtro.SortOrder = this.sort.direction;
         this.filtro.SortColumn = this.sort.active;
         this.dataSource.listar(this.filtro);
-    }
-
-    listarEvento() {
-        let filtro = {
-            Estado: -1
-        } as IEventoFiltroCombo;
-        this.eventoService.listarCmb(filtro)
-            .subscribe((response) => {
-                if (response.success) {
-                    let lstEvento = [];
-                    let iTodos = {
-                        Id: -1,
-                        Nombre: "-- TODOS --"
-                    } as IEventoCombo;
-                    lstEvento.push(iTodos);
-
-                    response.data.forEach(function (item) {
-                        lstEvento.push(item);
-                    })
-                    this.lstEvento = lstEvento;
-                }
-                else {
-                    this.lstEvento = [];
-                }
-                this.mensajesService.msgAutoClose();
-            },
-            (error: any) => {
-                this.mensajesService.msgError("No se pudieron cargar los registros");
-                this.mensajesService.msgAutoClose();
-            });
     }
 
     listarEstado() {
@@ -230,6 +199,7 @@ export class ListarPostulantesComponent implements OnInit, AfterViewInit {
 
         this.paginator.firstPage();
         this.filtro.NumeroDocumento = this.NumDoc.value;
+        this.filtro.Correo = this.Correo.value;
         this.filtro.Nombres = this.Nombres.value;
         this.filtro.Estado = this.Estado.value;
         this.filtro.PuestoId = this.puestoId;
@@ -333,8 +303,54 @@ export class ListarPostulantesComponent implements OnInit, AfterViewInit {
         }
     }
 
+    AbrirCV(url: string) {
+        this.mensajesService.msgLoad("Descargando...");
+        if (url) {
+            const downloadUrl = `${environment.apiURL}/f/SecureFiles${url}`;
+
+            fetch(downloadUrl, {
+                method: 'GET',
+                headers: {
+                    // Agrega headers si necesitas autenticación
+                    // 'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    this.mensajesService.msgErrorMixin("Curriculum Vitae", "Error al descargar el archivo");
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const blobUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = this.extraerNombreArchivo(url); // nombre sugerido
+                a.click();
+                window.URL.revokeObjectURL(blobUrl);
+                this.mensajesService.msgSuccessMixin("Curriculum Vitae", "Descarga correcta");
+            })
+            .catch(error => {
+                console.error('Error al descargar el archivo:', error);
+            });
+        } else {
+            console.error('URL no válida');
+        }
+    }
+
+    private extraerNombreArchivo(url: string): string {
+        return url.split('/').pop() || 'archivo.pdf';
+    }
+
+    getFileName(filePath: string): string {
+        if (!filePath) return '';
+        const parts = filePath.split('/');
+        return parts[parts.length - 1]; // Devuelve el último segmento de la ruta
+    }
+
     get Nombres(): any { return this.frmUsuario.get('nombres'); }
     get NumDoc(): any { return this.frmUsuario.get('numdoc'); }
+    get Correo(): any { return this.frmUsuario.get('correo'); }
     get Estado(): any { return this.frmUsuario.get('estado'); }
 }
 

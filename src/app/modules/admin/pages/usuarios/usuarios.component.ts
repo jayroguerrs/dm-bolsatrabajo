@@ -31,6 +31,7 @@ import { GestionUsuarioComponent } from './gestion-usuario/gestion-usuario.compo
 import { GestionRolesComponent } from './gestion-roles/gestion-roles.component';
 import { StatusResponse } from 'app/core/services/StatusResponse.model';
 import * as FileSaver from 'file-saver';
+import { AuthService } from 'app/core/auth/auth.service';
 
 @Component({
     selector        : 'usuarios',
@@ -79,6 +80,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 
     constructor(
         private usuarioService: UsuarioService,
+        private authService: AuthService,
         private catalogoDetalleService: CatalogoDetalleService,
         private rolService: RolService,
         private mensajesService: MensajesService,
@@ -308,14 +310,14 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
             });
     }
 
-    notificar(usuarioId : number) : void{
+    notificar(email : string) : void{
 
-        if (usuarioId != undefined && usuarioId > 0) {
+        if (email != undefined && email != '' ) {
 
             this.mensajesService.msgConfirm("¿Está seguro de enviar por correo electrónico el link para que el usuario seleccionado genere su contraseña?", () => {
                 this.mensajesService.msgLoad("Procesando...");
 
-                this.usuarioService.recuperarContrasenia(usuarioId).subscribe((respuesta: StatusResponse<boolean>) => {
+                this.authService.forgotPassword(email).subscribe((respuesta: StatusResponse<boolean>) => {
                     if (respuesta.success) {
                         this.mensajesService.msgSuccessMixin('Se envió el link para generar contraseña a la dirección de correo electrónico del usuario seleccionado.', "");
                     }

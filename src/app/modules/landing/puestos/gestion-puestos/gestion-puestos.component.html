@@ -19,7 +19,7 @@
                 <div>
                     <img
                         class="h-40 object-cover lg:h-80"
-                        [src]="objPuestos.Imagen"
+                        [src]="objPuestos.Imagen ? objPuestos.Imagen : 'images/pages/profile/cover.jpg'"
                         alt="Cover image"
                     />
                 </div>

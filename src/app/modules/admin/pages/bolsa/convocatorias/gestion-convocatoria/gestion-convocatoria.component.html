@@ -92,23 +92,6 @@
                     }
                 </mat-form-field>
             </div>
-
-            <!-- Estado -->
-            <div class="md:col-span-2">
-                <mat-form-field class="w-full">
-                    <mat-label>Estado</mat-label>
-                    <mat-select formControlName="estado"
-                        [class.componentes-deshabilitados]="puestoForm.get('estado').disabled"
-                    >
-                        <mat-option *ngFor="let objEstado of lstEstado" [value]="objEstado.Codigo">
-                            {{objEstado.Nombre }}
-                        </mat-option>
-                    </mat-select>
-                    @if (puestoForm.get('estado').hasError('required')) {
-                        <mat-error> El estado es necesario </mat-error>
-                    }
-                </mat-form-field>
-            </div>
         </div>
 
         <!-- Actions -->

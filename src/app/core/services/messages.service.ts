@@ -22,11 +22,14 @@ export class MensajesService {
         Swal.fire({
             title: title,
             icon: 'success',
-            html: text,
+            html: text && text.trim() !== "" ? text : undefined,
             allowOutsideClick: false,
             allowEscapeKey: false,
             confirmButtonColor: '#43a47',
             confirmButtonText: 'Aceptar',
+        didOpen: () => {
+            Swal.hideLoading();
+        }
         }).then((resultado) => {
             if (callBack) callBack();
         });

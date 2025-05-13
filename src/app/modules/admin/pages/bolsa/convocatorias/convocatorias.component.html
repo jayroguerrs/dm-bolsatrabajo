@@ -168,15 +168,16 @@
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="estado">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header class="w-40">Estado</th>
-                        <td mat-cell *matCellDef="let element" class="w-40">
-                            <span
-                                    class="inline-flex items-center font-bold text-xs px-2.5 py-0.5 rounded-full tracking-wide uppercase"
-                                    [ngClass]="{'bg-red-200 text-red-800 dark:bg-red-600 dark:text-red-50': element.EstadoTexto === 'INACTIVO',
-                                                'bg-blue-200 text-blue-800 dark:bg-blue-600 dark:text-blue-50': element.EstadoTexto === 'ACTIVO'
-                                            }">
-                                    <span class="leading-relaxed ">{{element.EstadoTexto}}</span>
-                                </span>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header class="w-50">Estado</th>
+                        <td mat-cell *matCellDef="let element" class="w-50">
+                            <mat-slide-toggle
+                                class="mt-8 sm:ml-auto sm:mt-0"
+                                [color]="'primary'"
+                                [(ngModel)]="element.Estado"
+                                (toggleChange)="cambiarEstado(element)"
+                            >
+                            <span class=" pr-6 text-sm">{{ element.EstadoTexto }}</span>
+                            </mat-slide-toggle>
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="fechaCreacion">

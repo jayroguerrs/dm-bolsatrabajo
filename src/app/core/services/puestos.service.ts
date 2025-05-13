@@ -4,7 +4,7 @@ import { environment } from "environments/environments";
 import { Observable } from "rxjs";
 import { StatusResponse } from "./StatusResponse.model";
 
-import { IPuestos, IPuestosFiltroPaginado, IPuestosFiltro, IPuestosFiltroPorIdDto, IPuestosFiltroPaginadoNoCaptcha, IPuestosInsUpd, IPuestosEli, IPostulantes, IPostulantesFiltroPaginado, IPostulantesFiltro } from "../interfaces/iPuestos";
+import { IPuestos, IPuestosFiltroPaginado, IPuestosFiltro, IPuestosFiltroPorIdDto, IPuestosFiltroPaginadoNoCaptcha, IPuestosInsUpd, IPuestosEli, IPostulantes, IPostulantesFiltroPaginado, IPostulantesFiltro, IPuestosActEstado } from "../interfaces/iPuestos";
 import { AuthService } from "../auth/auth.service";
 
 @Injectable({
@@ -54,6 +54,10 @@ export class PuestosService {
         }
 
         return this.http.post<StatusResponse<IPuestos[]>>(`${this.API_URL}/listarPaginadoNoCaptcha`, request );
+    }
+
+    cambiarEstado(request: IPuestosActEstado): Observable<StatusResponse<boolean>> {
+        return this.http.patch<StatusResponse<boolean>>(`${this.API_URL}/actualizarEstado`, request);
     }
 
     obtenerPorId(request: IPuestosFiltroPorIdDto): Observable<StatusResponse<IPuestos>> {
