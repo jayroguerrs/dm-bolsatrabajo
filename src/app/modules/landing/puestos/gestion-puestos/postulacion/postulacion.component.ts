@@ -1,12 +1,15 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component , Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import {
+    AbstractControl,
     FormArray,
     FormControl,
     FormsModule,
     ReactiveFormsModule,
     UntypedFormBuilder,
     UntypedFormGroup,
+    ValidationErrors,
+    ValidatorFn,
     Validators,
 } from '@angular/forms';
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
@@ -106,7 +109,7 @@ export class PostulacionComponent implements OnInit  {
             materno:    ['', Validators.required],
             correo:    ['', [Validators.required, Validators.email]],
             celular:    ['', [Validators.required, Validators.minLength(9) , Validators.pattern('^[0-9]{9}$')]],
-            tipodoc:    [-1, Validators.required],
+            tipodoc:    [-1, [Validators.required, ValidaTipoDoc()]],
             dni:        ['', [Validators.required, Validators.pattern('^[0-9]{8}$')]],
             documento:  this._formBuilder.array([], Validators.required)
 
@@ -268,4 +271,12 @@ export class PostulacionComponent implements OnInit  {
             this.mensajesService.msgWarning("Hay campos pendientes de validación");
         }
     }
+}
+
+export function ValidaTipoDoc(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        return control.value === -1 || control.value === null
+            ? { invalidValue: true }
+            : null;
+    };
 }

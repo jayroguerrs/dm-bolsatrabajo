@@ -36,7 +36,7 @@
             <div class="md:row-start-2 md:col-span-2">
                 <mat-form-field class="w-full">
                     <mat-label>Nombre del Detalle</mat-label>
-                    <input [onlyLetter]="true" matInput [formControlName]="'nombre'" maxlength="50"
+                    <input matInput [formControlName]="'nombre'" maxlength="50"
                         [class.componentes-deshabilitados]="catalogoDetalleForm.get('nombre').disabled"
                     />
                     @if (catalogoDetalleForm.get('nombre').hasError('required')) {

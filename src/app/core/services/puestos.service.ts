@@ -80,10 +80,10 @@ export class PuestosService {
      */
     generarReporte(request: IPuestosFiltro, tipo: number) {
         let params = new HttpParams();
-        params = params.append('Usuario', request.Usuario);
-        params = params.append('Sexo', request.Sexo);
-        params = params.append('RolId', request.RolId);
-        params = params.append('TipoRolId', request.TipoRolId);
+        if (request.FechaRegistro) {
+            request.FechaRegistro = new Date(request.FechaRegistro).toISOString().split('T')[0] as unknown as Date;
+        }
+        params = params.append('Titulo', request.Titulo);
         params = params.append('Estado', request.Estado);
         if (request.SortColumn == undefined) request.SortColumn = '';
         if (request.SortOrder == undefined) request.SortOrder = '';

@@ -9,6 +9,15 @@ export const NoAuthGuard: CanActivateFn | CanActivateChildFn = (
 ) => {
     const router: Router = inject(Router);
 
+    const allowedWithoutCheck = [
+        '/admin/reset-password',
+    ];
+
+    // Permitir acceso directo a rutas excluidas
+    if (allowedWithoutCheck.some(path => state.url.startsWith(path))) {
+        return of(true);
+    }
+
     // Check the authentication status
     return inject(AuthService)
         .check()

@@ -23,11 +23,11 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { OnlyLetterDirective } from 'app/core/directives/onlyLetter.directive';
-import { EventoService } from 'app/core/services/evento.service';
 import { Router } from '@angular/router';
 import { PuestosService } from 'app/core/services/puestos.service';
-import { IPuestos, IPuestosFiltroPaginadoNoCaptcha } from 'app/core/interfaces/iPuestos';
+import { IPuestos, IPuestosFiltro, IPuestosFiltroPaginadoNoCaptcha } from 'app/core/interfaces/iPuestos';
 import { GestionConvocatoriasComponent } from './gestion-convocatoria/gestion-convocatoria.component';
+import * as FileSaver from 'file-saver';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 
 @Component({
@@ -78,7 +78,6 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
     constructor(
         private puestosService: PuestosService,
         private catalogoDetalleService: CatalogoDetalleService,
-        private eventoService: EventoService,
         private mensajesService: MensajesService,
         private _formBuilder: UntypedFormBuilder,
         private _matDialog: MatDialog,
@@ -247,28 +246,27 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
     }
 
     ReporteExcel() {
-        /*
         if (this.dataSource.totalItems === 0) {
             this.mensajesService.msgExportarVacio;
         } else {
             this.mensajesService.msgLoad("Descargando...");
             let filtroReporte = {
                 Titulo: this.filtro.Titulo,
-                EventoId: this.filtro.EventoId,
+                FechaRegistro: this.filtro.FechaRegistro,
                 Estado: this.filtro.Estado,
                 SortColumn : this.sort.active,
                 SortOrder : this.sort.direction
-            } as IFormularioFiltro;
+            } as IPuestosFiltro;
 
             //1: Excel, 2: PDF
-            this.formularioService.generarReporte(filtroReporte, 1).subscribe({
+            this.puestosService.generarReporte(filtroReporte, 1).subscribe({
                 next: (respuesta: any) => {
                     ;
                     if (respuesta != null) {
                         const blob = new Blob([respuesta], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                        const vNombre = "ListaUsuarios_" + (new Date).toLocaleDateString() + ".xlsx";
+                        const vNombre = "ListaConvocatorias_" + (new Date).toLocaleDateString() + ".xlsx";
                         FileSaver.saveAs(blob, vNombre);
-                        this.mensajesService.msgSuccessMixin("Reporte de usuarios", "Descargado correctamente")
+                        this.mensajesService.msgSuccessMixin("Reporte de Convocatorias", "Descargado correctamente")
                     } else {
                         this.mensajesService.msgError("Error al descargar el archivo");
                     }
@@ -278,33 +276,30 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
                 }
             });
         }
-        */
     }
 
     ReportePDF() {
-        /*
         if (this.dataSource.totalItems === 0) {
             this.mensajesService.msgExportarVacio;
         } else {
             this.mensajesService.msgLoad("Descargando...");
             let filtroReporte = {
-                EventoId: this.filtro.EventoId,
                 Titulo: this.filtro.Titulo,
-                Fecha: this.filtro.Fecha,
+                FechaRegistro: this.filtro.FechaRegistro,
                 Estado: this.filtro.Estado,
                 SortColumn : this.sort.active,
                 SortOrder : this.sort.direction
-            } as IFormularioFiltro;
+            } as IPuestosFiltro;
 
             //1: Excel, 2: PDF
-            this.formularioService.generarReporte(filtroReporte, 2).subscribe({
+            this.puestosService.generarReporte(filtroReporte, 2).subscribe({
                 next: (respuesta: any) => {
                     ;
                     if (respuesta != null) {
                         const blob = new Blob([respuesta], { type: 'application/pdf' });
-                        const vNombre = "ListaUsuarios_" + (new Date).toLocaleDateString() + ".pdf";
+                        const vNombre = "ListaConvocatorias_" + (new Date).toLocaleDateString() + ".pdf";
                         FileSaver.saveAs(blob, vNombre);
-                        this.mensajesService.msgSuccessMixin("Reporte de usuarios", "Descargado correctamente")
+                        this.mensajesService.msgSuccessMixin("Reporte de convocatorias", "Descargado correctamente")
                     } else {
                         this.mensajesService.msgError("Error al descargar el archivo");
                     }
@@ -314,7 +309,6 @@ export class ConvocatoriasComponent implements OnInit, AfterViewInit {
                 }
             });
         }
-        */
     }
 
     abrirModalConvocatoria(vId?: number, frmDisabled?: boolean) {

@@ -105,7 +105,6 @@ export class GestionConvocatoriasComponent implements OnInit {
                 fechainicio: [{ value: null, disabled: this.frmDisabled }],
                 fechafin: [{ value: null, disabled: this.frmDisabled }],
             }),
-            estado:             [{value: '', disabled: this.frmDisabled}, [Validators.required]],
         });
     }
 
@@ -131,7 +130,7 @@ export class GestionConvocatoriasComponent implements OnInit {
                     this.puestoForm.controls['titulo'].setValue(response.data.Titulo.toString());
                     this.puestoForm.controls['descripcion'].setValue(response.data.Descripcion.toString());
                     this.puestoForm.controls['departamento'].setValue(response.data.DepartamentoId);
-                    this.puestoForm.controls['estado'].setValue(response.data.Estado.toString());
+                    //this.puestoForm.controls['estado'].setValue(response.data.Estado.toString());
 
                     // Primero carga los distritos
                     this.listarDistrito(response.data.DepartamentoId);
@@ -180,7 +179,7 @@ export class GestionConvocatoriasComponent implements OnInit {
                     : '';
 
                 iPuestos.DistritoId = this.Distrito.value;
-                iPuestos.Estado = this.Estado.value;
+                //iPuestos.Estado = this.Estado.value;
 
                 this.puestosService.insertar(iPuestos)
                     .subscribe((response) => {

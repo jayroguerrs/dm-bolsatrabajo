@@ -2,7 +2,7 @@ export interface ICatalogoDetalle {
     Id: number;
     Codigo: string;
     Nombre: string;
-    IdCatalogo?: string;
+    CatalogoId?: number;
     Catalogo?: string;
     Abreviatura?: string;
     Descripcion?: string;

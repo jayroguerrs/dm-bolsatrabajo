@@ -64,7 +64,7 @@ export class CatalogoDetalleService {
      */
     generarReporte(request: ICatalogoDetalleFiltro, tipo: number) {
         let params = new HttpParams();
-        params = params.append('IdCatalogo', request.IdCatalogo);
+        params = params.append('CatalogoId', request.IdCatalogo);
         params = params.append('Nombre', request.Nombre);
         params = params.append('Estado', request.Estado);
         if (request.SortColumn == undefined) request.SortColumn = '';

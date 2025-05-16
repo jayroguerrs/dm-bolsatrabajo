@@ -78,6 +78,21 @@ export class AuthService {
         );
     }
 
+    forgotPasswordNA(email: string): Observable<any> {
+        let params = new HttpParams();
+        params = params.append('email', email);
+        params = params.append('url', environment.apiFront);
+        return this._httpClient.get(`${this.API_URL}/solicitarCambioContrasenaNA`, { params }).pipe(
+            switchMap((response: any) => {
+                if (response.success == true) {
+                    let respuesta = {} as StatusResponse<any>;
+                    respuesta.success = true;
+                    return of(respuesta);
+                }
+            })
+        );
+    }
+
     /**
      * Reset password
      *

@@ -66,6 +66,11 @@
                             {{objTipoDoc.Nombre }}
                         </mat-option>
                     </mat-select>
+                    @if (postulacionForm.get('tipodoc').hasError('required')) {
+                        <mat-error> El tipo de documento es necesario </mat-error>
+                    } @else if (postulacionForm.get('tipodoc').hasError('invalidValue')) {
+                        <mat-error> El tipo de documento es necesario </mat-error>
+                    }
                 </mat-form-field>
             </div>
 
@@ -77,9 +82,9 @@
                         [class.componentes-deshabilitados]="postulacionForm.get('dni').disabled"
                     />
                     @if (postulacionForm.get('dni').hasError('required')) {
-                        <mat-error> El DNI es necesario </mat-error>
+                        <mat-error> El número de documento es necesario </mat-error>
                     } @else if (postulacionForm.get('dni').hasError('pattern')) {
-                        <mat-error> El DNI solo puede contener números </mat-error>
+                        <mat-error> El documento sólo puede contener números </mat-error>
                     }
                 </mat-form-field>
             </div>

@@ -82,7 +82,7 @@ export class GestionCatalogoDetalleComponent implements OnInit {
             .subscribe((response) => {
                 if (response.success) {
                     this.catalogoDetalleForm.controls['nombre'].setValue(response.data.Nombre);
-                    this.catalogoDetalleForm.controls['catalogo'].setValue(response.data.IdCatalogo);
+                    this.catalogoDetalleForm.controls['catalogo'].setValue(response.data.CatalogoId);
                     this.catalogoDetalleForm.controls['abreviatura'].setValue(response.data.Abreviatura);
                     this.catalogoDetalleForm.controls['descripcion'].setValue(response.data.Descripcion);
                     this.catalogoDetalleForm.controls['codigo'].setValue(response.data.Codigo);
@@ -111,7 +111,7 @@ export class GestionCatalogoDetalleComponent implements OnInit {
                 iCatalogoDetalle.Abreviatura = this.Abreviatura.value;
                 iCatalogoDetalle.Descripcion = this.Descripcion.value;
                 iCatalogoDetalle.Ordenamiento = this.Ordenamiento.value;
-                iCatalogoDetalle.Catalogo = this.Catalogo.value;
+                iCatalogoDetalle.CatalogoId = this.CatalogoId.value;
                 iCatalogoDetalle.Estado = this.Estado.value;
 
                 this.catalogoDetalleService.insertar(iCatalogoDetalle)
@@ -209,7 +209,7 @@ export class GestionCatalogoDetalleComponent implements OnInit {
     get Abreviatura(): any { return this.catalogoDetalleForm.get('abreviatura'); }
     get Descripcion(): any { return this.catalogoDetalleForm.get('descripcion'); }
     get Ordenamiento(): any { return this.catalogoDetalleForm.get('ordenamiento'); }
-    get Catalogo(): any { return this.catalogoDetalleForm.get('catalogo'); }
+    get CatalogoId(): any { return this.catalogoDetalleForm.get('catalogo'); }
     get Estado(): any { return this.catalogoDetalleForm.get('estado'); }
 }
 

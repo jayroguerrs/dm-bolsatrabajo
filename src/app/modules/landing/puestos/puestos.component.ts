@@ -162,7 +162,7 @@ export class PuestosComponent
             SortColumn: this.sort.active,
             Titulo: this.filtro.Titulo,
             Ubicacion: this.filtro.Ubicacion,
-            Estado: this.filtro.Estado,
+            Estado: 1,
             FechaRegistro: this.filtro.FechaRegistro,
             RecaptchaToken: ""
         }
@@ -182,7 +182,7 @@ export class PuestosComponent
             Titulo: "",
             Ubicacion: "",
             FechaRegistro: null,
-            Estado: -1,
+            Estado: 1,
             RecaptchaToken: ""
         }
         this.dataSource = new GrillaPaginado(this.puestosService, this.mensajesService, this.recaptchaService);
@@ -208,7 +208,7 @@ export class PuestosComponent
         this.filtro.FechaRegistro = this.FechaRegistro.value;
         this.filtro.Titulo = this.Titulo.value;
         this.filtro.Ubicacion = this.Ubicacion.value;
-        this.filtro.Estado = -1;
+        this.filtro.Estado = 1;
         this.filtro.RecaptchaToken = '';
 
         this.dataSource.listar(this.filtro);

@@ -168,15 +168,22 @@
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="nombres">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header class="w-50"> Nombre </th>
-                        <td mat-cell *matCellDef="let element" class="w-50">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header class="w-60"> Nombre </th>
+                        <td mat-cell *matCellDef="let element" class="w-60">
                             <span class=" pr-6 text-sm">{{ element.Nombres }}</span>
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="correo">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header class="w-40"> Correo </th>
-                        <td mat-cell *matCellDef="let element" class="w-40">
-                            <span class="pr-6 text-sm">{{ element.Correo }}</span>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header class="w-50"> Correo </th>
+                        <td mat-cell *matCellDef="let element" class="w-50">
+                            <div class="flex items-center space-x-2">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:envelope'"></mat-icon>
+                                <p class="text-sm">{{ element.Correo }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-2">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:phone'"></mat-icon>
+                                <p class="text-sm">{{ element.Celular }}</p>
+                            </div>
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="archivo">

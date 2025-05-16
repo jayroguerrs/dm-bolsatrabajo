@@ -15,7 +15,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { IPuestos,  IPuestosFiltroPorIdDto } from 'app/core/interfaces/iPuestos';
 import { PuestosService } from 'app/core/services/puestos.service';
 import { MatTableModule } from '@angular/material/table';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FuseCardComponent } from '@fuse/components/card';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { PostulacionComponent } from './postulacion/postulacion.component';
@@ -41,6 +41,7 @@ import { PostulacionComponent } from './postulacion/postulacion.component';
         MatSelectModule,
         TextFieldModule,
         ReactiveFormsModule,
+        RouterLink
     ],
     animations: [
         trigger('fadeInOut', [
@@ -120,7 +121,10 @@ export class GestionPuestosComponent
         const dialogRef = this._matDialog.open(PostulacionComponent, dialogConfig);
 
         dialogRef.afterClosed().subscribe((result) => {
-
+            if (result) {
+                //this.mensajesService.msgSuccess("Se ha postulado correctamente");
+                this.router.navigate(['/confirmacion']);
+            }
         });
     }
 }

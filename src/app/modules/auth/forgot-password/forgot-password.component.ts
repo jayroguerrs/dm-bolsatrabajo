@@ -11,10 +11,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
+import { MensajesService } from 'app/core/services/messages.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -50,7 +51,9 @@ export class AuthForgotPasswordComponent implements OnInit {
      */
     constructor(
         private _authService: AuthService,
-        private _formBuilder: UntypedFormBuilder
+        private _formBuilder: UntypedFormBuilder,
+        private mensajesService: MensajesService,
+        private router: Router,
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -87,7 +90,7 @@ export class AuthForgotPasswordComponent implements OnInit {
         this.showAlert = false;
 
         // Forgot password
-        this._authService.forgotPassword(this.forgotPasswordForm.get('email').value)
+        this._authService.forgotPasswordNA(this.forgotPasswordForm.get('email').value)
             .pipe(
                 finalize(() => {
                     // Re-enable the form
@@ -103,12 +106,8 @@ export class AuthForgotPasswordComponent implements OnInit {
             .subscribe(
                 (response) => {
                     // Set the alert
-                    this.alert = {
-                        type: 'success',
-                        message:
-                            "Se ha enviado un correo electrónico con un enlace para restablecer su contraseña. Por favor, revise su bandeja de entrada y siga las instrucciones.",
-                    };
-                    this.mostrar = false;
+                    this.mensajesService.msgSuccessMixin("Correo enviado correctamente", "");
+                    this.router.navigate(['/admin/forgot-password/confirmacion']);
                 },
                 (response) => {
                     // Set the alert

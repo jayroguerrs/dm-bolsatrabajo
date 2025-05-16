@@ -16,14 +16,16 @@
             >
                 Iniciar Sesión
             </div>
-            <div class="mt-0.5 flex items-baseline font-medium">
-                <div>¿No posees una cuenta?</div>
-                <a
-                    class="ml-1 text-primary-500 hover:underline"
-                    [routerLink]="['/sign-up']"
-                    >Regístrese
-                </a>
-            </div>
+            <!--
+                <div class="mt-0.5 flex items-baseline font-medium">
+                    <div>¿No posees una cuenta?</div>
+                    <a
+                        class="ml-1 text-primary-500 hover:underline"
+                        [routerLink]="['/sign-up']"
+                        >Regístrese
+                    </a>
+                </div>
+            -->
 
             <!-- Alert -->
             <fuse-alert
@@ -32,7 +34,7 @@
                 [showIcon]="false"
                 [type]="'info'"
             >
-                Estás navegando en <strong>Facturación App</strong>. Presione en Iniciar Sesión para comenzar.
+                Estás navegando en <strong>Bolsa de Trabajo</strong>. Presione en Iniciar Sesión para comenzar.
             </fuse-alert>
 
             <!-- Alert -->
@@ -100,16 +102,18 @@
                 <div
                     class="mt-1.5 inline-flex w-full items-center justify-between"
                 >
-                    <mat-checkbox
-                        class="-ml-2"
-                        [color]="'primary'"
-                        [formControlName]="'rememberMe'"
-                    >
-                        Recuerdame
-                    </mat-checkbox>
+                    <!--
+                        <mat-checkbox
+                            class="-ml-2"
+                            [color]="'primary'"
+                            [formControlName]="'rememberMe'"
+                        >
+                            Recuerdame
+                        </mat-checkbox>
+                    -->
                     <a
                         class="text-md font-medium text-primary-500 hover:underline"
-                        [routerLink]="['/forgot-password']"
+                        [routerLink]="['/admin/forgot-password']"
                         >¿Olvidó su contraseña?
                     </a>
                 </div>
@@ -134,17 +138,23 @@
                 </button>
 
                 <!-- Separator -->
-                <div class="mt-8 flex items-center">
-                    <div class="mt-px flex-auto border-t"></div>
-                    <div class="text-secondary mx-2">Desarrollado por jayroguerrs</div>
-                    <div class="mt-px flex-auto border-t"></div>
-                </div>
+                <!--
+                    <div class="mt-8 flex items-center">
+                        <div class="mt-px flex-auto border-t"></div>
+                        <div class="text-secondary mx-2">Desarrollado por jayroguerrs</div>
+                        <div class="mt-px flex-auto border-t"></div>
+                    </div>
+                -->
             </form>
         </div>
     </div>
     <div
         class="relative hidden h-full w-1/2 flex-auto items-center justify-center overflow-hidden bg-primary-600 p-16 dark:border-l md:flex lg:px-28"
     >
+        <img
+            class="absolute inset-0 h-full w-full object-cover"
+            [src]="'images/pages/auth/test.jpg'"
+        />
         <!-- Background -->
         <!-- Rings -->
         <!-- prettier-ignore -->
@@ -169,8 +179,10 @@
         <!-- Content -->
         <div class="relative z-10 w-full max-w-2xl">
             <div class="text-7xl font-bold leading-none text-gray-100">
-                <div>Bienvenido al</div>
-                <div>Portal de aplicaciones de la Derrama Magisterial</div>
+                <!--
+                    <div>Bienvenido al</div>
+                    <div>Portal de aplicaciones de la Derrama Magisterial</div>
+                -->
             </div>
 
         </div>

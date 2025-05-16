@@ -35,10 +35,9 @@ export interface IPuestosFiltroPaginadoNoCaptcha {
 }
 
 export interface IPuestosFiltro {
-    Usuario: string;
-    Sexo: number;
-    RolId: number;
-    TipoRolId: number;
+    FechaRegistro?: Date;
+    Titulo?: string;
+    Ubicacion?: string;
     Estado: number;
     SortColumn: string;
     SortOrder: string;

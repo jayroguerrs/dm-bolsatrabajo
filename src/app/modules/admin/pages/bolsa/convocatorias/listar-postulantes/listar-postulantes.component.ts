@@ -255,9 +255,9 @@ export class ListarPostulantesComponent implements OnInit, AfterViewInit {
                     ;
                     if (respuesta != null) {
                         const blob = new Blob([respuesta], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                        const vNombre = "ListaUsuarios_" + (new Date).toLocaleDateString() + ".xlsx";
+                        const vNombre = "ListaPostulantes_" + (new Date).toLocaleDateString() + ".xlsx";
                         FileSaver.saveAs(blob, vNombre);
-                        this.mensajesService.msgSuccessMixin("Reporte de usuarios", "Descargado correctamente")
+                        this.mensajesService.msgSuccessMixin("Reporte de Postulantes", "Descargado correctamente")
                     } else {
                         this.mensajesService.msgError("Error al descargar el archivo");
                     }
@@ -289,9 +289,9 @@ export class ListarPostulantesComponent implements OnInit, AfterViewInit {
                     ;
                     if (respuesta != null) {
                         const blob = new Blob([respuesta], { type: 'application/pdf' });
-                        const vNombre = "ListaUsuarios_" + (new Date).toLocaleDateString() + ".pdf";
+                        const vNombre = "ListaPostulantes_" + (new Date).toLocaleDateString() + ".pdf";
                         FileSaver.saveAs(blob, vNombre);
-                        this.mensajesService.msgSuccessMixin("Reporte de usuarios", "Descargado correctamente")
+                        this.mensajesService.msgSuccessMixin("Reporte de Postulantes", "Descargado correctamente")
                     } else {
                         this.mensajesService.msgError("Error al descargar el archivo");
                     }
